@@ -13,9 +13,10 @@ enum WebViewConstants {
 }
 
 protocol WebViewViewControllerDelegate: AnyObject {
-    // WebViewViewController получил код
-    func webViewViewController(_ vc: WebViewViewController, didAutenticateWithCode code: String)
-    // пользователь нажал кнопку назад и отменил авторизацию
+    func webViewViewController(
+        _ vc: WebViewViewController,
+        didAutenticateWithCode code: String
+    )
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
@@ -36,6 +37,52 @@ final class WebViewViewController: UIViewController {
         setupUISubviews()
 
         loadAuthView()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        webView.addObserver(
+            self,
+            forKeyPath: #keyPath(WKWebView.estimatedProgress),
+            options: .new,
+            context: nil
+        )
+        
+        updateProgress()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        webView.removeObserver(
+            self,
+            forKeyPath: #keyPath(WKWebView.estimatedProgress),
+            context: nil
+        )
+    }
+    
+    override func observeValue(
+        forKeyPath keyPath: String?,
+        of object: Any?,
+        change: [NSKeyValueChangeKey : Any]?,
+        context: UnsafeMutableRawPointer?
+    ) {
+        if keyPath == #keyPath(WKWebView.estimatedProgress) {
+            updateProgress()
+        } else {
+            super.observeValue(
+                forKeyPath: keyPath,
+                of: object,
+                change: change,
+                context: context
+            )
+        }
+    }
+    
+    private func updateProgress() {
+        progressView.progress = Float(webView.estimatedProgress)
+        progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
     
     private func loadAuthView() {
@@ -116,7 +163,6 @@ extension WebViewViewController {
         
         view.translatesAutoresizingMaskIntoConstraints = false
         view.progressTintColor = .ypBlack
-        view.progress = 0.5
         
         return view
     }
