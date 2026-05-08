@@ -55,7 +55,7 @@ final class AuthViewController: UIViewController {
         
         button.addTarget(
             self,
-            action: #selector(Self.loginButtonDidTap),
+            action: #selector(Self.didTapLoginButton),
             for: .touchUpInside
         )
         
@@ -81,7 +81,7 @@ final class AuthViewController: UIViewController {
         navigationItem.backBarButtonItem?.tintColor = .ypBlack
     }
     
-    @objc private func loginButtonDidTap() {
+    @objc private func didTapLoginButton() {
         performSegue(withIdentifier: showWebViewSegueIdentifier, sender: nil)
     }
     
