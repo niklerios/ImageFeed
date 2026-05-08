@@ -21,6 +21,7 @@ protocol WebViewViewControllerDelegate: AnyObject {
 
 final class WebViewViewController: UIViewController {
     private lazy var webView = createWebView()
+    private lazy var progressView = createProgressView()
     
     weak var delegate: WebViewViewControllerDelegate?
     
@@ -55,37 +56,9 @@ final class WebViewViewController: UIViewController {
         
         webView.load(URLRequest(url: url))
     }
-    
-    private func setupUI() {
-        view.backgroundColor = .ypWhite
-    }
-    
-    private func setupUISubviews() {
-        view.addSubview(webView)
-        
-        setupSubviewsConstraints()
-    }
-    
-    private func createWebView() -> WKWebView {
-        let webView = WKWebView()
-        
-        webView.translatesAutoresizingMaskIntoConstraints = false
-        webView.backgroundColor = .ypWhite
-        webView.navigationDelegate = self
-        
-        return webView
-    }
-    
-    private func setupSubviewsConstraints() {
-        NSLayoutConstraint.activate([
-            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
-        ])
-    }
 }
 
+// MARK: - WKNavigationDelegate
 extension WebViewViewController: WKNavigationDelegate {
     func webView(
         _ webView: WKWebView,
@@ -112,5 +85,68 @@ extension WebViewViewController: WKNavigationDelegate {
         } else {
             return nil
         }
+    }
+}
+
+// MARK: - UI Settings
+extension WebViewViewController {
+    private func setupUI() {
+        view.backgroundColor = .ypWhite
+    }
+    
+    private func setupUISubviews() {
+        view.addSubview(webView)
+        view.addSubview(progressView)
+        
+        setupSubviewsConstraints()
+    }
+
+    private func createWebView() -> WKWebView {
+        let webView = WKWebView()
+        
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        webView.backgroundColor = .ypWhite
+        webView.navigationDelegate = self
+        
+        return webView
+    }
+    
+    private func createProgressView() -> UIProgressView {
+        let view = UIProgressView(progressViewStyle: .default)
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.progressTintColor = .ypBlack
+        view.progress = 0.5
+        
+        return view
+    }
+    
+    private func setupSubviewsConstraints() {
+        NSLayoutConstraint.activate([
+            // webView
+            webView.leadingAnchor.constraint(
+                equalTo: view.leadingAnchor
+            ),
+            webView.trailingAnchor.constraint(
+                equalTo: view.trailingAnchor
+            ),
+            webView.bottomAnchor.constraint(
+                equalTo: view.bottomAnchor
+            ),
+            webView.topAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.topAnchor
+            ),
+            
+            // progressView
+            progressView.topAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.topAnchor
+            ),
+            progressView.leadingAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.leadingAnchor
+            ),
+            progressView.trailingAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.trailingAnchor
+            )
+        ])
     }
 }

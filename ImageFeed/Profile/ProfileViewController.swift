@@ -40,7 +40,10 @@ final class ProfileViewController: UIViewController {
     private func didTapLogoutButton(_ sender: UIButton) {
         print("Exit")
     }
-    
+}
+
+// MARK: - UI Settings
+extension ProfileViewController {
     private func setupUI() {
         view.backgroundColor = .ypBlack
     }

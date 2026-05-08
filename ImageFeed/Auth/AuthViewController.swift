@@ -8,7 +8,6 @@
 import UIKit
 
 final class AuthViewController: UIViewController {
-
     private lazy var logoImageView = createLogoImageView()
     private lazy var loginButton = createLoginButton()
     
@@ -20,46 +19,6 @@ final class AuthViewController: UIViewController {
         setupUI()
         setupSubviews()
         configureBackButton()
-    }
-    
-    private func setupUI() {
-        view.backgroundColor = .ypBlack
-    }
-    
-    private func setupSubviews() {
-        view.addSubview(logoImageView)
-        view.addSubview(loginButton)
-        
-        setupSubviewsConstraints()
-    }
-    
-    private func createLogoImageView() -> UIImageView {
-        let image = UIImage(resource: .logo)
-        let imageView = UIImageView(image: image)
-        
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        return imageView
-    }
-    
-    private func createLoginButton() -> UIButton {
-        let button = UIButton(type: .system)
-        
-        button.setTitle("Войти", for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.titleLabel?.font = .boldSystemFont(ofSize: 17)
-        button.setTitleColor(.ypBlack, for: .normal)
-        button.backgroundColor = .ypWhite
-        button.layer.cornerRadius = 16
-        button.clipsToBounds = true
-        
-        button.addTarget(
-            self,
-            action: #selector(Self.didTapLoginButton),
-            for: .touchUpInside
-        )
-        
-        return button
     }
     
     private func configureBackButton() {
@@ -96,6 +55,61 @@ final class AuthViewController: UIViewController {
         } else {
             super.prepare(for: segue, sender: sender)
         }
+    }
+}
+
+// MARK: - WebViewViewControllerDelegate
+extension AuthViewController: WebViewViewControllerDelegate {
+    func webViewViewController(_ vc: WebViewViewController, didAutenticateWithCode code: String) {
+        // TODO: -
+    }
+    
+    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
+        vc.dismiss(animated: true)
+    }
+}
+
+// MARK: - UI Settings
+extension AuthViewController {
+    private func setupUI() {
+        view.backgroundColor = .ypBlack
+    }
+    
+    private func setupSubviews() {
+        view.addSubview(logoImageView)
+        view.addSubview(loginButton)
+        
+        setupSubviewsConstraints()
+    }
+    
+    private func createLogoImageView() -> UIImageView {
+        let image = UIImage(resource: .logo)
+        let imageView = UIImageView(image: image)
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        return imageView
+    }
+    
+    private func createLoginButton() -> UIButton {
+        let button = UIButton(type: .system)
+        
+        button.setTitle("Войти", for: .normal)
+        button.setTitleColor(.ypBlack, for: .normal)
+
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.titleLabel?.font = .boldSystemFont(ofSize: 17)
+        button.backgroundColor = .ypWhite
+        button.layer.cornerRadius = 16
+        button.clipsToBounds = true
+        
+        button.addTarget(
+            self,
+            action: #selector(Self.didTapLoginButton),
+            for: .touchUpInside
+        )
+        
+        return button
     }
     
     private func setupSubviewsConstraints() {
@@ -134,15 +148,5 @@ final class AuthViewController: UIViewController {
                 equalToConstant: 48
             )
         ])
-    }
-}
-
-extension AuthViewController: WebViewViewControllerDelegate {
-    func webViewViewController(_ vc: WebViewViewController, didAutenticateWithCode code: String) {
-        // TODO: -
-    }
-    
-    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        vc.dismiss(animated: true)
     }
 }
