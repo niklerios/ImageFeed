@@ -18,26 +18,7 @@ final class AuthViewController: UIViewController {
         
         setupUI()
         setupSubviews()
-        configureBackButton()
-    }
-    
-    private func configureBackButton() {
-        guard let nav = navigationController else {
-            return
-        }
-        
-        let backImage = UIImage(resource: .backButton)
-        
-        nav.navigationBar.backIndicatorImage = backImage
-        nav.navigationBar.backIndicatorTransitionMaskImage = backImage
-
-        navigationItem.backBarButtonItem = UIBarButtonItem(
-            title: "",
-            style: .plain,
-            target: nil,
-            action: nil
-        )
-        navigationItem.backBarButtonItem?.tintColor = .ypBlack
+        configureNavigationBackButton()
     }
     
     @objc private func didTapLoginButton() {
@@ -80,6 +61,25 @@ extension AuthViewController {
         view.addSubview(loginButton)
         
         setupSubviewsConstraints()
+    }
+    
+    private func configureNavigationBackButton() {
+        guard let nav = navigationController else {
+            return
+        }
+        
+        let backImage = UIImage(resource: .backButton)
+        
+        nav.navigationBar.backIndicatorImage = backImage
+        nav.navigationBar.backIndicatorTransitionMaskImage = backImage
+
+        navigationItem.backBarButtonItem = UIBarButtonItem(
+            title: "",
+            style: .plain,
+            target: nil,
+            action: nil
+        )
+        navigationItem.backBarButtonItem?.tintColor = .ypBlack
     }
     
     private func createLogoImageView() -> UIImageView {
