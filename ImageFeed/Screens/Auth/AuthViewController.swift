@@ -8,6 +8,8 @@
 import UIKit
 
 final class AuthViewController: UIViewController {
+    private lazy var oAuth2Service = OAuth2Service()
+    
     private lazy var logoImageView = createLogoImageView()
     private lazy var loginButton = createLoginButton()
     
@@ -37,16 +39,25 @@ final class AuthViewController: UIViewController {
             super.prepare(for: segue, sender: sender)
         }
     }
+    
+    private func closeWebView(controller vc: WebViewViewController) {
+        vc.navigationController?.popViewController(animated: true)
+    }
 }
 
 // MARK: - WebViewViewControllerDelegate
 extension AuthViewController: WebViewViewControllerDelegate {
-    func webViewViewController(_ vc: WebViewViewController, didAutenticateWithCode code: String) {
-        // TODO: -
+    func webViewViewController(
+        _ vc: WebViewViewController,
+        didAutenticateWithCode code: String
+    ) {
+        oAuth2Service.fetchOAuthToken(with: code) { result in
+            print(result)
+        }
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        vc.dismiss(animated: true)
+        self.closeWebView(controller: vc)
     }
 }
 
