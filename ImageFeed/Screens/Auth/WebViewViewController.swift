@@ -40,7 +40,7 @@ final class WebViewViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        super.viewDidAppear(animated)
         
         webView.addObserver(
             self,
@@ -53,7 +53,7 @@ final class WebViewViewController: UIViewController {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
+        super.viewWillAppear(animated)
         
         webView.removeObserver(
             self,
