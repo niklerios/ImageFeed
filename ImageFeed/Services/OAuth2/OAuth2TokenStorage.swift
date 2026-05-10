@@ -11,6 +11,8 @@ final class OAuth2TokenStorage: OAuth2TokenStorageProtocol {
     private enum Keys: String { case token }
     private let store: UserDefaults = .standard
     
+    static let shared = OAuth2TokenStorage()
+    
     var token: String? {
         get {
             store.string(forKey: Keys.token.rawValue)

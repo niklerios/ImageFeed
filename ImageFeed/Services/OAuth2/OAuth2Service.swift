@@ -13,9 +13,11 @@ final class OAuth2Service: OAuth2ServiceProtocol {
     private let networkClient: NetworkClientProtocol
     private var tokenStorage: OAuth2TokenStorageProtocol
     
+    static let shared = OAuth2Service()
+    
     init(
-        networkClient: NetworkClientProtocol = NetworkClient(),
-        tokenStorage: OAuth2TokenStorageProtocol = OAuth2TokenStorage()
+        networkClient: NetworkClientProtocol = NetworkClient.shared,
+        tokenStorage: OAuth2TokenStorageProtocol = OAuth2TokenStorage.shared
     ) {
         self.networkClient = networkClient
         self.tokenStorage = tokenStorage

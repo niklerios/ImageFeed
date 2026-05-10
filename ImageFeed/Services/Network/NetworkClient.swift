@@ -11,6 +11,8 @@ struct NetworkClient: NetworkClientProtocol {
     private let decoder: JSONDecoder
     private let urlSession: URLSession
     
+    static let shared = NetworkClient()
+    
     init(
         decoder: JSONDecoder = JSONDecoder(),
         urlSession: URLSession = .shared
