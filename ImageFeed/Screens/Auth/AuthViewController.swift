@@ -39,10 +39,6 @@ final class AuthViewController: UIViewController {
             super.prepare(for: segue, sender: sender)
         }
     }
-    
-    private func closeWebView(controller vc: WebViewViewController) {
-        vc.navigationController?.popViewController(animated: true)
-    }
 }
 
 // MARK: - WebViewViewControllerDelegate
@@ -57,7 +53,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        self.closeWebView(controller: vc)
+        vc.navigationController?.popViewController(animated: true)
     }
 }
 
