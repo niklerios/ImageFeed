@@ -8,10 +8,6 @@
 import UIKit
 import WebKit
 
-enum WebViewConstants {
-    static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
-}
-
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewController(
         _ vc: WebViewViewController,
@@ -25,10 +21,6 @@ final class WebViewViewController: UIViewController {
     private lazy var progressView = createProgressView()
     
     weak var delegate: WebViewViewControllerDelegate?
-    
-    private var unsplashAuthorizeURLComponents: URLComponents? {
-        URLComponents(string: WebViewConstants.unsplashAuthorizeURLString)
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,7 +45,7 @@ final class WebViewViewController: UIViewController {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        super.viewWillDisappear(animated)
         
         webView.removeObserver(
             self,
@@ -86,20 +78,13 @@ final class WebViewViewController: UIViewController {
     }
     
     private func loadAuthView() {
-        guard var components = unsplashAuthorizeURLComponents else {
-            return
-        }
-        
-        components.queryItems = [
-            URLQueryItem(name: "client_id", value: Constants.accessKey),
-            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
-            URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "scope", value: Constants.accessScope)
-        ]
-        
-        guard let url = components.url else {
-            return
-        }
+        let url = NetworkURL.base(path: "/oauth/authorize") { queryBuilder in
+            queryBuilder
+                .add(.client_id, Constants.accessKey)
+                .add(.redirect_uri, Constants.redirectURI)
+                .add(.response_type, "code")
+                .add(.scope, Constants.accessScope)
+        }.url
         
         webView.load(URLRequest(url: url))
     }

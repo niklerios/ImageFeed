@@ -211,7 +211,7 @@
         <!--TabBar-->
         <scene sceneID="tGv-my-y3w">
             <objects>
-                <tabBarController id="QAx-w7-VvF" userLabel="TabBar" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="UITabBarController" id="QAx-w7-VvF" userLabel="TabBar" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" itemPositioning="fill" id="Wgo-Cf-bq6">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>

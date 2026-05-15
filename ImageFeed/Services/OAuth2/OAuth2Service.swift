@@ -7,6 +7,15 @@
 
 import Foundation
 
+protocol OAuth2ServiceProtocol: AnyObject {
+    typealias Completion<T> = NetworkRequest<T>.Completion
+    
+    func fetchOAuthToken(
+        with code: String,
+        completion: @escaping Completion<OAuthTokenResponseBody>
+    )
+}
+
 final class OAuth2Service: OAuth2ServiceProtocol {
     private let baseURLString = Constants.baseURLString
 
@@ -23,38 +32,27 @@ final class OAuth2Service: OAuth2ServiceProtocol {
         self.tokenStorage = tokenStorage
     }
     
-    func fetchOAuthToken(with code: String, completion: @escaping Completion<String>) {
-        guard let url = makeOAuthTokenURL(code: code) else {
-            preconditionFailure("Unable to create URL for OAuth2 token fetching")
+    func fetchOAuthToken(with code: String, completion: @escaping Completion<OAuthTokenResponseBody>) {
+        let networkURL = NetworkURL.base(path: "/oauth/token") { queryBuilder in
+            queryBuilder
+                .add(.redirect_uri, Constants.redirectURI)
+                .add(.client_secret, Constants.secretKey)
+                .add(.client_id, Constants.accessKey)
+                .add(.grant_type, "authorization_code")
+                .add(.code, code)
         }
-        
-        networkClient.post(url, responseType: OAuthTokenResponseBody.self) { result in
-            switch result {
-                case let .success(data):
-                    self.tokenStorage.token = data.accessToken
-                    completion(.success(data.accessToken))
-                case let .failure(error):
-                    error.log()
-                    completion(.failure(error))
+
+        let networkRequest = NetworkRequest(
+            url: networkURL.url,
+            responseType: OAuthTokenResponseBody.self
+        ) {
+            if case let .success(data) = $0 {
+                self.tokenStorage.token = data.accessToken
             }
-        }
-    }
-
-    private func makeOAuthTokenURL(code: String) -> URL? {
-        guard var urlComponents = URLComponents(string: baseURLString) else {
-            return nil
+            
+            completion($0)
         }
         
-        urlComponents.path = "/oauth/token"
-
-        urlComponents.queryItems = [
-            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
-            URLQueryItem(name: "client_secret", value: Constants.secretKey),
-            URLQueryItem(name: "client_id", value: Constants.accessKey),
-            URLQueryItem(name: "grant_type", value: "authorization_code"),
-            URLQueryItem(name: "code", value: code),
-        ]
-        
-        return urlComponents.url
+        networkClient.post(with: networkRequest)
     }
 }

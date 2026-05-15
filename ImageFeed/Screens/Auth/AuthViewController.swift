@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol AuthViewControllerDelegate: AnyObject {
+    func didAuthenticate(_ vc: AuthViewController)
+}
+
 final class AuthViewController: UIViewController {
     private lazy var oAuth2Service = OAuth2Service()
     
@@ -14,6 +18,8 @@ final class AuthViewController: UIViewController {
     private lazy var loginButton = createLoginButton()
     
     private let showWebViewSegueIdentifier = "ShowWebView"
+    
+    weak var delegate: AuthViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,13 +53,15 @@ extension AuthViewController: WebViewViewControllerDelegate {
         _ vc: WebViewViewController,
         didAutenticateWithCode code: String
     ) {
+        vc.dismissOrPop()
+
         oAuth2Service.fetchOAuthToken(with: code) { result in
-            print(result)
+           
         }
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        vc.navigationController?.popViewController(animated: true)
+        vc.dismissOrPop()
     }
 }
 

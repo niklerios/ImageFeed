@@ -7,6 +7,10 @@
 
 import Foundation
 
+protocol OAuth2TokenStorageProtocol: AnyObject {
+    var token: String? { get set }
+}
+
 final class OAuth2TokenStorage: OAuth2TokenStorageProtocol {
     private enum Keys: String { case token }
     private let store: UserDefaults = .standard
