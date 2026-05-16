@@ -38,7 +38,9 @@ struct NetworkClient {
     
     static let shared = NetworkClient()
     
-    private init() {}
+    private init() {
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+    }
     
     private func fetch<T>(with request: Request<T>, method: NetworkMethod) {
         var request = request

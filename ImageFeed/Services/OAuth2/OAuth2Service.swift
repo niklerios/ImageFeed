@@ -17,8 +17,6 @@ protocol OAuth2ServiceProtocol: AnyObject {
 }
 
 final class OAuth2Service: OAuth2ServiceProtocol {
-    private let baseURLString = Constants.baseURLString
-
     private let networkClient: NetworkClientProtocol
     private var tokenStorage: OAuth2TokenStorageProtocol
     

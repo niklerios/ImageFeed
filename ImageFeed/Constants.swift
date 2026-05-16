@@ -22,7 +22,8 @@ extension Constants {
 
     private static func getValue(fromEnv key: String) -> String {
         guard let value = env[key] else {
-            fatalError("Отсутствует переменная окружения \(key)")
+            assertionFailure("Отсутствует переменная окружения \(key)")
+            return ""
         }
         
         return value

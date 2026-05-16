@@ -13,9 +13,7 @@ struct NetworkRequest<T> {
     
     var urlRequest: URLRequest
 
-    private let url: URL
     private let responseType: ResponseType
-
     private let completion: Completion
     private let completionQueue: DispatchQueue
     
@@ -25,7 +23,6 @@ struct NetworkRequest<T> {
         completionQueue: DispatchQueue,
         completion: @escaping Completion
     ) {
-        self.url = url
         self.urlRequest = URLRequest(url: url)
         self.responseType = responseType
         self.completionQueue = completionQueue
