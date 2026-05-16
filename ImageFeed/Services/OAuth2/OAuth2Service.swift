@@ -24,7 +24,7 @@ final class OAuth2Service: OAuth2ServiceProtocol {
     
     static let shared = OAuth2Service()
     
-    init(
+    private init(
         networkClient: NetworkClientProtocol = NetworkClient.shared,
         tokenStorage: OAuth2TokenStorageProtocol = OAuth2TokenStorage.shared
     ) {
