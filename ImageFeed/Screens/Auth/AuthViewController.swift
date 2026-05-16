@@ -12,7 +12,7 @@ protocol AuthViewControllerDelegate: AnyObject {
 }
 
 final class AuthViewController: UIViewController {
-    private lazy var oAuth2Service = OAuth2Service()
+    private lazy var oAuth2Service = OAuth2Service.shared
     
     private lazy var logoImageView = createLogoImageView()
     private lazy var loginButton = createLoginButton()
