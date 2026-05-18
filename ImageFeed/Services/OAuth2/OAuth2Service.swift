@@ -8,7 +8,7 @@
 import Foundation
 
 protocol OAuth2ServiceProtocol: AnyObject {
-    typealias Completion<T> = NetworkRequest<T>.Completion
+    typealias Completion<T> = ApiRequests.Completion<T>
     
     func fetchOAuthToken(
         with code: String,
@@ -31,20 +31,7 @@ final class OAuth2Service: OAuth2ServiceProtocol {
     }
     
     func fetchOAuthToken(with code: String, completion: @escaping Completion<OAuthTokenResponseBody>) {
-        let networkURL = NetworkURL.base(path: "/oauth/token") { queryParams in
-            queryParams
-                .add(.redirect_uri, Constants.redirectURI)
-                .add(.client_secret, Constants.secretKey)
-                .add(.client_id, Constants.accessKey)
-                .add(.grant_type, "authorization_code")
-                .add(.code, code)
-        }
-
-        let networkRequest = NetworkRequest(
-            url: networkURL.url,
-            requestId: .fetchOAuthToken,
-            responseType: OAuthTokenResponseBody.self
-        ) {
+        let request = ApiRequests.fetchOAuthTokenRequest(code: code) {
             if case let .success(data) = $0 {
                 self.tokenStorage.token = data.accessToken
             }
@@ -52,6 +39,6 @@ final class OAuth2Service: OAuth2ServiceProtocol {
             completion($0)
         }
         
-        networkClient.post(with: networkRequest)
+        networkClient.post(with: request)
     }
 }

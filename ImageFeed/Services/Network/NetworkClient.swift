@@ -8,25 +8,26 @@
 import Foundation
 
 protocol NetworkClientProtocol {
-    typealias Request<T: Decodable> = NetworkRequest<T>
+    typealias RequestId = NetworkTaskStorage.RequestId
+    typealias Request<T: Decodable, ID: RequestId> = NetworkRequest<T, ID>
 
-    func post<T>(with request: Request<T>)
-    func put<T>(with request: Request<T>)
-    func get<T>(with request: Request<T>)
-    func delete<T>(with request: Request<T>)
+    func post<T, ID>(with request: Request<T, ID>)
+    func put<T, ID>(with request: Request<T, ID>)
+    func get<T, ID>(with request: Request<T, ID>)
+    func delete<T, ID>(with request: Request<T, ID>)
 }
 
 extension NetworkClient: NetworkClientProtocol {
-    func post<T>(with request: Request<T>) {
+    func post<T, ID>(with request: Request<T, ID>) {
         fetch(with: request, method: .post)
     }
-    func put<T>(with request: Request<T>) {
+    func put<T, ID>(with request: Request<T, ID>) {
         fetch(with: request, method: .put)
     }
-    func get<T>(with request: Request<T>) {
+    func get<T, ID>(with request: Request<T, ID>) {
         fetch(with: request, method: .get)
     }
-    func delete<T>(with request: Request<T>) {
+    func delete<T, ID>(with request: Request<T, ID>) {
         fetch(with: request, method: .delete)
     }
 }
@@ -43,7 +44,7 @@ struct NetworkClient {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
     }
     
-    private func fetch<T>(with request: Request<T>, method: NetworkMethod) {
+    private func fetch<T: Decodable, ID>(with request: Request<T, ID>, method: NetworkMethod) {
         var request = request
 
         let urlRequest = request.originalRequest

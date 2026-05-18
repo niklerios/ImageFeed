@@ -78,15 +78,9 @@ final class WebViewViewController: UIViewController {
     }
     
     private func loadAuthView() {
-        let url = NetworkURL.base(path: "/oauth/authorize") { queryBuilder in
-            queryBuilder
-                .add(.client_id, Constants.accessKey)
-                .add(.redirect_uri, Constants.redirectURI)
-                .add(.response_type, "code")
-                .add(.scope, Constants.accessScope)
-        }.url
+        let request = ApiRequests.loadAuthWebPageRequest()
         
-        webView.load(URLRequest(url: url))
+        webView.load(request.originalRequest)
     }
 }
 

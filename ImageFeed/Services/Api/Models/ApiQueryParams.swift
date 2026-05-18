@@ -1,11 +1,11 @@
 //
-//  NetworkQueryParam.swift
+//  ApiQueryParams.swift
 //  ImageFeed
 //
-//  Created by Alfa on 15.05.2026.
+//  Created by Alfa on 18.05.2026.
 //
 
-enum NetworkQueryParam: String {
+enum ApiQueryParams: String {
     case redirect_uri
     case client_secret
     case client_id

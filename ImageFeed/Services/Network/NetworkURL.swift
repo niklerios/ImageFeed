@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct NetworkURL {
+struct NetworkURL<K: RawRepresentable & Hashable> where K.RawValue == String {
     final class QueryParams {
-        fileprivate var store = [(NetworkQueryParam, String)]()
+        fileprivate var store = [(K, String)]()
         fileprivate init() {}
         
         @discardableResult
-        func add(_ key: NetworkQueryParam, _ value: String) -> Self {
+        func add(_ key: K, _ value: String) -> Self {
             guard !value.isEmpty else { return self }
             
             store.append((key, value))

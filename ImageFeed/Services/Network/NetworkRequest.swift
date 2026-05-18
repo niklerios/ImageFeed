@@ -7,23 +7,23 @@
 
 import Foundation
 
-struct NetworkRequest<T> {
+struct NetworkRequest<T, ID: NetworkTaskStorage.RequestId> {
     typealias Completion = (Result<T, NetworkError>) -> Void
     typealias ResponseType = T.Type
     
     var originalRequest: URLRequest
-    let requestId: NetworkRequestId?
+    let requestId: ID?
 
     private let responseType: ResponseType
-    private let completion: Completion
+    private let completion: Completion?
     private let completionQueue: DispatchQueue
     
     init(
         url: URL,
-        requestId: NetworkRequestId? = nil,
+        requestId: ID? = nil,
         responseType: ResponseType,
         completionQueue: DispatchQueue = .main,
-        completion: @escaping Completion
+        completion: Completion? = nil
     ) {
         self.originalRequest = URLRequest(url: url)
         self.requestId = requestId
@@ -35,6 +35,8 @@ struct NetworkRequest<T> {
     }
     
     private func executeCompletion(_ result: Result<T, NetworkError>) {
+        guard let completion else { return }
+
         completionQueue.async {
             completion(result)
         }
