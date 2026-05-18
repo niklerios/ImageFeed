@@ -35,6 +35,7 @@ struct NetworkClient {
     private let decoder = JSONDecoder()
     private let urlSession: URLSession = .shared
     private let logger: NetworkLogger = .enabled
+    private let taskStorage: NetworkTaskStorage = .shared
     
     static let shared = NetworkClient()
     
@@ -45,29 +46,52 @@ struct NetworkClient {
     private func fetch<T>(with request: Request<T>, method: NetworkMethod) {
         var request = request
 
+        let urlRequest = request.originalRequest
+        let requestId = request.requestId
+
         request.setHTTPMethod(method)
         
         let failure: (NetworkError) -> Void = {
             request.onFailure($0)
-            logger.failure(error: $0, request: request.urlRequest)
+            logger.failure(error: $0, request: urlRequest)
         }
         
         let success: (Data, T) -> Void = {
             request.onSuccess($1)
-            logger.success(data: $0, request: request.urlRequest)
+            logger.success(data: $0, request: urlRequest)
+        }
+        
+        if let sameTask = taskStorage.findTask(by: requestId) {
+            let previousTaskUrl = sameTask.originalRequest?.url
+            let currentTaskUrl = urlRequest.url
+            
+            guard previousTaskUrl != currentTaskUrl else {
+                return failure(.requestAlreadyInProgress)
+            }
+            
+            taskStorage.delete(by: requestId)
+            sameTask.cancel()
         }
                 
-        let task = urlSession.dataTask(with: request.urlRequest) { data, response, error in
-            if let error {
+        let task = urlSession.dataTask(with: urlRequest) { data, response, error in
+            defer {
+                taskStorage.delete(by: requestId)
+            }
+            
+            if let error = error as? URLError {
                 return failure(.urlRequestError(error))
             }
             
+            if let error {
+                return failure(.unknownError(error))
+            }
+            
             guard let response = response as? HTTPURLResponse else {
-                return failure(.urlSessionError)
+                return failure(.invalidResponse)
             }
             
             guard let data else {
-                return failure(.invalidResponse)
+                return failure(.missingResponseData)
             }
             
             guard 200..<300 ~= response.statusCode else {
@@ -76,11 +100,14 @@ struct NetworkClient {
             
             do {
                 success(data, try decode(data))
-            } catch {
+            } catch let error as DecodingError {
                 failure(.decodingError(error))
+            } catch {
+                failure(.unknownError(error))
             }
         }
         
+        taskStorage.store(task, for: requestId)
         task.resume()
     }
     

@@ -8,8 +8,9 @@
 import Foundation
 
 struct NetworkURL {
-    class QueryParams {
+    final class QueryParams {
         fileprivate var store = [(NetworkQueryParam, String)]()
+        fileprivate init() {}
         
         @discardableResult
         func add(_ key: NetworkQueryParam, _ value: String) -> Self {

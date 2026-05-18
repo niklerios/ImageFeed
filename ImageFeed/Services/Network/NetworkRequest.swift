@@ -11,7 +11,8 @@ struct NetworkRequest<T> {
     typealias Completion = (Result<T, NetworkError>) -> Void
     typealias ResponseType = T.Type
     
-    var urlRequest: URLRequest
+    var originalRequest: URLRequest
+    let requestId: NetworkRequestId?
 
     private let responseType: ResponseType
     private let completion: Completion
@@ -19,29 +20,18 @@ struct NetworkRequest<T> {
     
     init(
         url: URL,
+        requestId: NetworkRequestId? = nil,
         responseType: ResponseType,
-        completionQueue: DispatchQueue,
+        completionQueue: DispatchQueue = .main,
         completion: @escaping Completion
     ) {
-        self.urlRequest = URLRequest(url: url)
+        self.originalRequest = URLRequest(url: url)
+        self.requestId = requestId
         self.responseType = responseType
         self.completionQueue = completionQueue
         self.completion = completion
         
         setHTTPMethod(.get)
-    }
-    
-    init(
-        url: URL,
-        responseType: ResponseType,
-        completion: @escaping Completion
-    ) {
-        self.init(
-            url: url,
-            responseType: responseType,
-            completionQueue: .main,
-            completion: completion
-        )
     }
     
     private func executeCompletion(_ result: Result<T, NetworkError>) {
@@ -59,6 +49,6 @@ struct NetworkRequest<T> {
     }
     
     mutating func setHTTPMethod(_ method: NetworkMethod) {
-        urlRequest.httpMethod = method.value
+        originalRequest.httpMethod = method.value
     }
 }

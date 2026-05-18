@@ -31,8 +31,8 @@ final class OAuth2Service: OAuth2ServiceProtocol {
     }
     
     func fetchOAuthToken(with code: String, completion: @escaping Completion<OAuthTokenResponseBody>) {
-        let networkURL = NetworkURL.base(path: "/oauth/token") { queryBuilder in
-            queryBuilder
+        let networkURL = NetworkURL.base(path: "/oauth/token") { queryParams in
+            queryParams
                 .add(.redirect_uri, Constants.redirectURI)
                 .add(.client_secret, Constants.secretKey)
                 .add(.client_id, Constants.accessKey)
@@ -42,6 +42,7 @@ final class OAuth2Service: OAuth2ServiceProtocol {
 
         let networkRequest = NetworkRequest(
             url: networkURL.url,
+            requestId: .fetchOAuthToken,
             responseType: OAuthTokenResponseBody.self
         ) {
             if case let .success(data) = $0 {
