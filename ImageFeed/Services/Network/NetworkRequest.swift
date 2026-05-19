@@ -60,7 +60,7 @@ struct NetworkRequest<T, ID: NetworkTaskStorage.RequestId> {
         originalRequest.httpMethod = method.value
     }
     
-    mutating func setAuthorization(
+    private mutating func setAuthorization(
         fromStorage storage: NetworkAuthStorageProtocol
     ) {
         guard

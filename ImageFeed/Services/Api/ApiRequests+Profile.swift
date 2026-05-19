@@ -6,6 +6,10 @@
 //
 
 extension ApiRequests {
+    
+    /// Запрос профиля пользователя
+    ///
+    /// - Parameter forUser: username пользователя
     func fetchProfile(
         forUser username: Int,
         completion: @escaping Completion<ProfileResponse>

@@ -6,6 +6,10 @@
 //
 
 extension ApiRequests {
+    
+    /// Запрос на токен авторизации
+    ///
+    /// - Parameter code: код авторизации ,пришедший от WebView со страницы oauth
     static func fetchOAuthTokenRequest(
         code: String,
         completion: @escaping Completion<OAuthTokenResponse>
@@ -27,6 +31,7 @@ extension ApiRequests {
         )
     }
     
+    /// Запрос на отображение страницы oauth
     static func loadAuthWebPageRequest() -> Request<Void> {
         let networkURL = URLBuilder.base(path: "/oauth/authorize") { queryParams in
             queryParams
