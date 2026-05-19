@@ -12,7 +12,8 @@ protocol AuthViewControllerDelegate: AnyObject {
 }
 
 final class AuthViewController: UIViewController {
-    private lazy var oAuth2Service = OAuth2Service.shared
+    private let oAuth2Service: OAuth2Service = .shared
+    private let loadingService: LoadingService = .shared
     
     private lazy var logoImageView = createLogoImageView()
     private lazy var loginButton = createLoginButton()
@@ -53,11 +54,13 @@ extension AuthViewController: WebViewViewControllerDelegate {
         _ vc: WebViewViewController,
         didAutenticateWithCode code: String
     ) {
-        showProgressHUD()
+        let loadingService = self.loadingService
+
+        loadingService.showProgress()
         vc.dismissOrPop()
 
         oAuth2Service.fetchOAuthToken(with: code) { [weak self] result in
-            defer { self?.dismissProgressHUD() }
+            defer { loadingService.hideProgress() }
 
             guard let self, case .success = result else {
                 return

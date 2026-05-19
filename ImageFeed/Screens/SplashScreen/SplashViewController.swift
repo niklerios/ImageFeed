@@ -8,19 +8,21 @@
 import UIKit
 
 final class SplashViewController: UIViewController {
+    private let profileService: ProfileService = .shared
+    private let loadingService: LoadingService = .shared
+    private let networkAuthStorage: NetworkAuthStorage = .shared
+
     private let showAuthViewSegueIdentifier = "ShowAuthView"
-    
-    var authToken: String? {
-        NetworkAuthStorage.shared.authToken
-    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if authToken != nil {
-            switchToTabBarController()
-        } else {
-            showAuthentication()
+        guard let _ = networkAuthStorage.authToken else {
+            return showAuthentication()
+        }
+        
+        fetchProfile { [weak self] in
+            self?.switchToTabBarController()
         }
     }
 
@@ -35,6 +37,22 @@ final class SplashViewController: UIViewController {
         }
         
         window.rootViewController = UIStoryboard.instantiate(UITabBarController.self)
+    }
+    
+    private func fetchProfile(completion: @escaping () -> ()) {
+        let loadingService = self.loadingService
+        
+        loadingService.showProgress()
+        
+        profileService.fetchProfile {
+            defer { loadingService.hideProgress() }
+
+            guard case .success = $0 else {
+                return
+            }
+            
+            completion()
+        }
     }
 }
 
@@ -59,6 +77,9 @@ extension SplashViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismissOrPop()
-        switchToTabBarController()
+        
+        fetchProfile { [weak self] in
+            self?.switchToTabBarController()
+        }
     }
 }

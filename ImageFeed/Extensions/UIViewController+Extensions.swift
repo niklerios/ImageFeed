@@ -21,15 +21,3 @@ extension UIViewController {
         navigationController.popViewController(animated: animated)
     }
 }
-
-extension UIViewController {
-    func showProgressHUD() {
-        UIApplication.shared.keyWindow?.isUserInteractionEnabled = false
-        ProgressHUD.animate()
-    }
-    
-    func dismissProgressHUD() {
-        UIApplication.shared.keyWindow?.isUserInteractionEnabled = true
-        ProgressHUD.dismiss()
-    }
-}

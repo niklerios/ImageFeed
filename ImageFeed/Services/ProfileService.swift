@@ -18,13 +18,21 @@ final class ProfileService: ProfileServiceProtocol {
     
     static let shared = ProfileService()
     
+    private(set) var profile: Profile?
+    
     private init(networkClient: NetworkClientProtocol = NetworkClient.shared) {
         self.networkClient = networkClient
     }
 
     func fetchProfile(completion: @escaping Completion<Profile>) {
         let request = ApiRequests.fetchMeRequest {
-            completion($0.map(Profile.init))
+            let result = $0.map(Profile.init)
+            
+            if case let .success(profile) = result {
+                self.profile = profile
+            }
+
+            completion(result)
         }
         
         networkClient.get(with: request)
