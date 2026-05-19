@@ -12,7 +12,7 @@ protocol OAuth2ServiceProtocol: AnyObject {
     
     func fetchOAuthToken(
         with code: String,
-        completion: @escaping Completion<OAuthTokenResponse>
+        completion: @escaping Completion<String>
     )
 }
 
@@ -30,7 +30,7 @@ final class OAuth2Service: OAuth2ServiceProtocol {
         self.authStorage = authStorage
     }
     
-    func fetchOAuthToken(with code: String, completion: @escaping Completion<OAuthTokenResponse>) {
+    func fetchOAuthToken(with code: String, completion: @escaping Completion<String>) {
         let request = ApiRequests.fetchOAuthTokenRequest(code: code) {
             if case let .success(data) = $0 {
                 self.authStorage.authToken = data.accessToken
@@ -38,7 +38,7 @@ final class OAuth2Service: OAuth2ServiceProtocol {
                 self.authStorage.username = data.username
             }
             
-            completion($0)
+            completion($0.map(\.accessToken))
         }
         
         networkClient.post(with: request)

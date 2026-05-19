@@ -1,0 +1,32 @@
+//
+//  ProfileService.swift
+//  ImageFeed
+//
+//  Created by Alfa on 19.05.2026.
+//
+
+protocol ProfileServiceProtocol: AnyObject {
+
+    typealias Completion<T> = ApiRequests.Completion<T>
+
+    func fetchProfile(completion: @escaping Completion<Profile>)
+}
+
+final class ProfileService: ProfileServiceProtocol {
+
+    private let networkClient: NetworkClientProtocol
+    
+    static let shared = ProfileService()
+    
+    private init(networkClient: NetworkClientProtocol = NetworkClient.shared) {
+        self.networkClient = networkClient
+    }
+
+    func fetchProfile(completion: @escaping Completion<Profile>) {
+        let request = ApiRequests.fetchMeRequest {
+            completion($0.map(Profile.init))
+        }
+        
+        networkClient.get(with: request)
+    }
+}

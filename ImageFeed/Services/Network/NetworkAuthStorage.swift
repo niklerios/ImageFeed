@@ -10,7 +10,7 @@ import Foundation
 protocol NetworkAuthStorageProtocol: AnyObject {
     var authToken: String? { get set }
     var tokenType: String? { get set }
-    var username: Int? { get set }
+    var username: String? { get set }
 }
 
 final class NetworkAuthStorage: NetworkAuthStorageProtocol {
@@ -37,9 +37,9 @@ final class NetworkAuthStorage: NetworkAuthStorageProtocol {
         }
     }
     
-    var username: Int? {
+    var username: String? {
         get {
-            store.integer(forKey: Keys.username.rawValue)
+            store.string(forKey: Keys.username.rawValue)
         }
         set {
             store.set(newValue, forKey: Keys.username.rawValue)

@@ -8,7 +8,10 @@
 import UIKit
 
 final class ProfileViewController: UIViewController {
+
     private let baseFontSize: CGFloat = 13
+
+    private let profileService = ProfileService.shared
     
     private lazy var userDescriptionLabel = createLabel(
         withText: "Hello, World!",
@@ -34,11 +37,23 @@ final class ProfileViewController: UIViewController {
 
         setupUI()
         setupSubviews()
+        loadProfileInfo()
     }
 
-    @objc
-    private func didTapLogoutButton(_ sender: UIButton) {
+    @objc private func didTapLogoutButton(_ sender: UIButton) {
         print("Exit")
+    }
+    
+    private func loadProfileInfo() {
+        profileService.fetchProfile { [weak self] result in
+            guard let self, case let .success(profile) = result else {
+                return
+            }
+            
+            self.userNameLabel.text = profile.name
+            self.userIdLabel.text = profile.login
+            self.userDescriptionLabel.text = profile.bio
+        }
     }
 }
 

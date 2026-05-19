@@ -57,11 +57,12 @@ extension AuthViewController: WebViewViewControllerDelegate {
         vc.dismissOrPop()
 
         oAuth2Service.fetchOAuthToken(with: code) { [weak self] result in
+            defer { self?.dismissProgressHUD() }
+
             guard let self, case .success = result else {
                 return
             }
-
-            self.dismissProgressHUD()
+            
             self.delegate?.didAuthenticate(self)
         }
     }

@@ -52,14 +52,14 @@ struct NetworkClient {
 
         request.setHTTPMethod(method)
         
-        let failure: (NetworkError) -> Void = {
+        let failure: (NetworkError, Data?) -> Void = {
             request.onFailure($0)
-            logger.failure(error: $0, request: urlRequest)
+            logger.failure(error: $0, data: $1, request: urlRequest)
         }
         
-        let success: (Data, T) -> Void = {
-            request.onSuccess($1)
-            logger.success(data: $0, request: urlRequest)
+        let success: (T, Data) -> Void = {
+            request.onSuccess($0)
+            logger.success(data: $1, request: urlRequest)
         }
         
         if let sameTask = taskStorage.findTask(by: requestId) {
@@ -67,7 +67,7 @@ struct NetworkClient {
             let currentTaskUrl = urlRequest.url
             
             guard previousTaskUrl != currentTaskUrl else {
-                return failure(.requestAlreadyInProgress)
+                return failure(.requestAlreadyInProgress, nil)
             }
             
             taskStorage.delete(by: requestId)
@@ -80,31 +80,31 @@ struct NetworkClient {
             }
             
             if let error = error as? URLError {
-                return failure(.urlRequestError(error))
+                return failure(.urlRequestError(error), nil)
             }
             
             if let error {
-                return failure(.unknownError(error))
+                return failure(.unknownError(error), nil)
             }
             
             guard let response = response as? HTTPURLResponse else {
-                return failure(.invalidResponse)
+                return failure(.invalidResponse, nil)
             }
             
             guard let data else {
-                return failure(.missingResponseData)
+                return failure(.missingResponseData, nil)
             }
             
             guard 200..<300 ~= response.statusCode else {
-                return failure(.statusCodeError(response.statusCode, data))
+                return failure(.statusCodeError(response.statusCode), data)
             }
             
             do {
-                success(data, try decode(data))
+                success(try decode(data), data)
             } catch let error as DecodingError {
-                failure(.decodingError(error))
+                failure(.decodingError(error), data)
             } catch {
-                failure(.unknownError(error))
+                failure(.unknownError(error), data)
             }
         }
         

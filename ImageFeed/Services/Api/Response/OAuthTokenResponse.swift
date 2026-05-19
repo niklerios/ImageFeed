@@ -10,5 +10,5 @@ import Foundation
 struct OAuthTokenResponse: Decodable {
     let accessToken: String
     let tokenType: String
-    let username: Int
+    let username: String
 }
