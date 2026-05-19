@@ -7,4 +7,5 @@
 
 enum ApiRequestIds: String, NetworkTaskStorage.RequestId {
     case fetchOAuthToken
+    case fetchProfile
 }

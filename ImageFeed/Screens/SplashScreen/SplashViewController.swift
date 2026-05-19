@@ -11,7 +11,7 @@ final class SplashViewController: UIViewController {
     private let showAuthViewSegueIdentifier = "ShowAuthView"
     
     var authToken: String? {
-        OAuth2TokenStorage.shared.token
+        NetworkAuthStorage.shared.authToken
     }
     
     override func viewDidAppear(_ animated: Bool) {

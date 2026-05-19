@@ -12,28 +12,30 @@ protocol OAuth2ServiceProtocol: AnyObject {
     
     func fetchOAuthToken(
         with code: String,
-        completion: @escaping Completion<OAuthTokenResponseBody>
+        completion: @escaping Completion<OAuthTokenResponse>
     )
 }
 
 final class OAuth2Service: OAuth2ServiceProtocol {
     private let networkClient: NetworkClientProtocol
-    private var tokenStorage: OAuth2TokenStorageProtocol
+    private var authStorage: NetworkAuthStorageProtocol
     
     static let shared = OAuth2Service()
     
     private init(
         networkClient: NetworkClientProtocol = NetworkClient.shared,
-        tokenStorage: OAuth2TokenStorageProtocol = OAuth2TokenStorage.shared
+        authStorage: NetworkAuthStorageProtocol = NetworkAuthStorage.shared
     ) {
         self.networkClient = networkClient
-        self.tokenStorage = tokenStorage
+        self.authStorage = authStorage
     }
     
-    func fetchOAuthToken(with code: String, completion: @escaping Completion<OAuthTokenResponseBody>) {
+    func fetchOAuthToken(with code: String, completion: @escaping Completion<OAuthTokenResponse>) {
         let request = ApiRequests.fetchOAuthTokenRequest(code: code) {
             if case let .success(data) = $0 {
-                self.tokenStorage.token = data.accessToken
+                self.authStorage.authToken = data.accessToken
+                self.authStorage.tokenType = data.tokenType
+                self.authStorage.username = data.username
             }
             
             completion($0)

@@ -22,6 +22,8 @@ struct NetworkRequest<T, ID: NetworkTaskStorage.RequestId> {
         url: URL,
         requestId: ID? = nil,
         responseType: ResponseType,
+        authorization: Bool = false,
+        authStorage: NetworkAuthStorageProtocol = NetworkAuthStorage.shared,
         completionQueue: DispatchQueue = .main,
         completion: Completion? = nil
     ) {
@@ -30,6 +32,10 @@ struct NetworkRequest<T, ID: NetworkTaskStorage.RequestId> {
         self.responseType = responseType
         self.completionQueue = completionQueue
         self.completion = completion
+        
+        if (authorization) {
+            setAuthorization(fromStorage: authStorage)
+        }
         
         setHTTPMethod(.get)
     }
@@ -52,5 +58,18 @@ struct NetworkRequest<T, ID: NetworkTaskStorage.RequestId> {
     
     mutating func setHTTPMethod(_ method: NetworkMethod) {
         originalRequest.httpMethod = method.value
+    }
+    
+    mutating func setAuthorization(
+        fromStorage storage: NetworkAuthStorageProtocol
+    ) {
+        guard
+            let token = storage.authToken,
+            let tokenType = storage.tokenType
+        else {
+            return
+        }
+        
+        originalRequest.setValue("\(tokenType) \(token)", forHTTPHeaderField: "Authorization")
     }
 }

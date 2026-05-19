@@ -31,24 +31,29 @@ struct NetworkURL<K: RawRepresentable & Hashable> where K.RawValue == String {
         urlComponents.url!
     }
     
-    private init(baseURLString: String, path: String, queryBuilder: QueryBuilder) {
-        var urlComponents = URLComponents(string: baseURLString)
-        
-        queryBuilder(&queryParams)
-        
-        urlComponents?.path = path
-        urlComponents?.queryItems = queryParams.store.map {
-            URLQueryItem(name: $0.rawValue, value: $1)
+    private init(baseURLString: String, path: String, queryBuilder: QueryBuilder?) {
+        guard var urlComponents = URLComponents(string: baseURLString) else {
+            preconditionFailure("Unable to create URL from baseURL: \(baseURLString)")
         }
         
-        guard let _ = urlComponents?.url else {
+        urlComponents.path = path
+        
+        if let queryBuilder {
+            queryBuilder(&queryParams)
+            
+            urlComponents.queryItems = queryParams.store.map {
+                URLQueryItem(name: $0.rawValue, value: $1)
+            }
+        }
+        
+        guard let _ = urlComponents.url else {
             preconditionFailure("Unable to create URL for path: \(path)")
         }
         
-        self.urlComponents = urlComponents!
+        self.urlComponents = urlComponents
     }
     
-    static func base(path: String, queryBuilder: QueryBuilder) -> Self {
+    static func base(path: String, queryBuilder: QueryBuilder? = nil) -> Self {
         self.init(
             baseURLString: Constants.baseURLString,
             path: path,
@@ -56,7 +61,7 @@ struct NetworkURL<K: RawRepresentable & Hashable> where K.RawValue == String {
         )
     }
     
-    static func baseApi(path: String, queryBuilder: QueryBuilder) -> Self {
+    static func baseApi(path: String, queryBuilder: QueryBuilder? = nil) -> Self {
         self.init(
             baseURLString: Constants.baseApiURLString,
             path: path,
