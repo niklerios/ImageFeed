@@ -7,5 +7,9 @@
 import Foundation
 
 struct UserResponse: Decodable {
-    
+    struct ProfileImage: Decodable {
+        let small: String
+    }
+
+    let profileImage: ProfileImage
 }

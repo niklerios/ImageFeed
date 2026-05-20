@@ -6,14 +6,12 @@
 //
 
 protocol ProfileServiceProtocol: AnyObject {
-
     typealias Completion<T> = ApiRequests.Completion<T>
 
     func fetchProfile(completion: @escaping Completion<Profile>)
 }
 
 final class ProfileService: ProfileServiceProtocol {
-
     private let networkClient: NetworkClientProtocol
     
     static let shared = ProfileService()

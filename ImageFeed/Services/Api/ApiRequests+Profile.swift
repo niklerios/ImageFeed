@@ -9,15 +9,16 @@ extension ApiRequests {
     
     /// Запрос профиля пользователя
     static func fetchUserRequest(
-        byName username: Int,
+        byName username: String,
         completion: @escaping Completion<UserResponse>
     ) -> Request<UserResponse> {
-        let networkURL = URLBuilder.base(path: "/users/\(username)")
+        let networkURL = URLBuilder.baseApi(path: "/users/\(username)")
         
         return Request(
             url: networkURL.url,
             requestId: .fetchUser,
             responseType: UserResponse.self,
+            authorization: true,
             completion: completion
         )
     }

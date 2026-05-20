@@ -13,18 +13,18 @@ final class ProfileViewController: UIViewController {
     private let baseFontSize: CGFloat = 13
     
     private lazy var userDescriptionLabel = createLabel(
-        withText: "Hello, World!",
+        withText: "Профиль не заполнен",
         font: UIFont.systemFont(ofSize: baseFontSize, weight: .regular)
     )
 
     private lazy var userIdLabel = createLabel(
-        withText: "@ekaterina_nov",
+        withText: "@неизвестный_пользователь",
         font: UIFont.systemFont(ofSize: baseFontSize, weight: .regular),
         color: .ypGray
     )
 
     private lazy var userNameLabel = createLabel(
-        withText: "Екатерина Новикова",
+        withText: "Имя не указано",
         font: UIFont.systemFont(ofSize: 23, weight: .bold)
     )
 
@@ -66,9 +66,15 @@ extension ProfileViewController {
             return
         }
         
-        userNameLabel.text = profile.name
-        userIdLabel.text = "@\(profile.username)"
-        userDescriptionLabel.text = profile.bio
+        if !profile.name.isEmpty {
+            userNameLabel.text = profile.name
+        }
+        if !profile.username.isEmpty {
+            userIdLabel.text = "@\(profile.username)"
+        }
+        if let bio = profile.bio, !bio.isEmpty {
+            userDescriptionLabel.text = bio
+        }
     }
     
     private func createUserAvatarImageView() -> UIImageView {

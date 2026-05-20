@@ -19,7 +19,8 @@
 ///     let networkRequest = Request(
 ///         url: networkURL.url,
 ///         requestId: .someRequest,
-///         responseType: SomeType.self
+///         responseType: SomeType.self,
+///         completion: completion
 ///     )
 ///
 ///     return networkRequest
