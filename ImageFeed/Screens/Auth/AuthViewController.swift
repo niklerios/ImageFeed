@@ -61,8 +61,11 @@ extension AuthViewController: WebViewViewControllerDelegate {
 
         oAuth2Service.fetchOAuthToken(with: code) { [weak self] result in
             defer { loadingService.hideProgress() }
+            
+            guard let self else { return }
 
-            guard let self, case .success = result else {
+            guard case .success = result else {
+                self.showAuthErrorAlert()
                 return
             }
             
@@ -173,5 +176,18 @@ extension AuthViewController {
                 equalToConstant: 48
             )
         ])
+    }
+    
+    private func showAuthErrorAlert() {
+        let alertController = UIAlertController(
+            title: "Что-то пошло не так",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert
+        )
+        let okAction = UIAlertAction(title: "Ок", style: .default)
+        
+        alertController.addAction(okAction)
+
+        present(alertController, animated: true)
     }
 }
