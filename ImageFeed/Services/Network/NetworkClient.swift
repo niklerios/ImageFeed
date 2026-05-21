@@ -8,26 +8,44 @@
 import Foundation
 
 protocol NetworkClientProtocol {
-    typealias RequestId = NetworkTaskStorage.RequestId
-    typealias Request<T: Decodable, ID: RequestId> = NetworkRequest<T, ID>
+    typealias Request<
+        Response: Decodable,
+        RequestId: NetworkTaskStorage.RequestId
+    > = NetworkRequest<Response, RequestId>
 
-    func post<T, ID>(with request: Request<T, ID>)
-    func put<T, ID>(with request: Request<T, ID>)
-    func get<T, ID>(with request: Request<T, ID>)
-    func delete<T, ID>(with request: Request<T, ID>)
+    func post<Response, RequestId>(
+        with request: Request<Response, RequestId>
+    )
+    func put<Response, RequestId>(
+        with request: Request<Response, RequestId>
+    )
+    func get<Response, RequestId>(
+        with request: Request<Response, RequestId>
+    )
+    func delete<Response, RequestId>(
+        with request: Request<Response, RequestId>
+    )
 }
 
 extension NetworkClient: NetworkClientProtocol {
-    func post<T, ID>(with request: Request<T, ID>) {
+    func post<Response, RequestId>(
+        with request: Request<Response, RequestId>
+    ) {
         fetch(with: request, method: .post)
     }
-    func put<T, ID>(with request: Request<T, ID>) {
+    func put<Response, RequestId>(
+        with request: Request<Response, RequestId>
+    ) {
         fetch(with: request, method: .put)
     }
-    func get<T, ID>(with request: Request<T, ID>) {
+    func get<Response, RequestId>(
+        with request: Request<Response, RequestId>
+    ) {
         fetch(with: request, method: .get)
     }
-    func delete<T, ID>(with request: Request<T, ID>) {
+    func delete<Response, RequestId>(
+        with request: Request<Response, RequestId>
+    ) {
         fetch(with: request, method: .delete)
     }
 }
@@ -44,7 +62,10 @@ struct NetworkClient {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
     }
     
-    private func fetch<T: Decodable, ID>(with request: Request<T, ID>, method: NetworkMethod) {
+    private func fetch<Response: Decodable, RequestId>(
+        with request: Request<Response, RequestId>,
+        method: NetworkMethod
+    ) {
         var request = request
 
         let urlRequest = request.originalRequest
@@ -57,7 +78,7 @@ struct NetworkClient {
             logger.failure(error: $0, data: $1, request: urlRequest)
         }
         
-        let success: (T, Data) -> Void = {
+        let success: (Response, Data) -> Void = {
             request.onSuccess($0)
             logger.success(data: $1, request: urlRequest)
         }

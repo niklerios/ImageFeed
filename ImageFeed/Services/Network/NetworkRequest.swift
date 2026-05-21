@@ -7,12 +7,12 @@
 
 import Foundation
 
-struct NetworkRequest<T, ID: NetworkTaskStorage.RequestId> {
-    typealias Completion = (Result<T, NetworkError>) -> Void
-    typealias ResponseType = T.Type
+struct NetworkRequest<Response, RequestId: NetworkTaskStorage.RequestId> {
+    typealias Completion = (Result<Response, NetworkError>) -> Void
+    typealias ResponseType = Response.Type
     
     var originalRequest: URLRequest
-    let requestId: ID?
+    let requestId: RequestId?
 
     private let responseType: ResponseType
     private let completion: Completion?
@@ -20,7 +20,7 @@ struct NetworkRequest<T, ID: NetworkTaskStorage.RequestId> {
     
     init(
         url: URL,
-        requestId: ID? = nil,
+        requestId: RequestId? = nil,
         responseType: ResponseType,
         authorization: Bool = false,
         authStorage: NetworkAuthStorageProtocol = NetworkAuthStorage.shared,
@@ -40,7 +40,7 @@ struct NetworkRequest<T, ID: NetworkTaskStorage.RequestId> {
         setHTTPMethod(.get)
     }
     
-    private func executeCompletion(_ result: Result<T, NetworkError>) {
+    private func executeCompletion(_ result: Result<Response, NetworkError>) {
         guard let completion else { return }
 
         completionQueue.async {
@@ -48,7 +48,7 @@ struct NetworkRequest<T, ID: NetworkTaskStorage.RequestId> {
         }
     }
     
-    func onSuccess(_ result: T) {
+    func onSuccess(_ result: Response) {
         executeCompletion(.success(result))
     }
     
