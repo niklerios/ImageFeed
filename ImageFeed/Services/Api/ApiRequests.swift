@@ -27,7 +27,6 @@
 /// }
 /// ```
 enum ApiRequests {
-
     /// Возвращаемый тип фабрики
     /// - Note: использовать вместо `NetworkRequest<T, ID>` напрямую
     typealias Request<T> = NetworkRequest<T, ApiRequestIds>

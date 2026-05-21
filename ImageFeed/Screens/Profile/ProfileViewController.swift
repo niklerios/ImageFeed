@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     private let profileService: ProfileService = .shared
@@ -15,6 +16,9 @@ final class ProfileViewController: UIViewController {
     private var profileImageServiceObserver: NSObjectProtocol?
     
     private let baseFontSize: CGFloat = 13
+    private let userAvatarSize: CGFloat = 70
+
+    private lazy var defaultAvatarImage = UIImage(systemName: "person.crop.circle.fill")
     
     private lazy var userDescriptionLabel = createLabel(
         withText: "Профиль не заполнен",
@@ -86,7 +90,17 @@ extension ProfileViewController {
             return
         }
         
-        print("UPDATE PROFILE AVATAR", avatarURL)
+        let radius = userAvatarSize / 2
+        let processor = RoundCornerImageProcessor(cornerRadius: radius)
+        
+        userAvatarImageView.kf.setImage(
+            with: avatarURL,
+            placeholder: defaultAvatarImage,
+            options: [
+                .processor(processor),
+                .transition(.fade(0.3))
+            ]
+        )
     }
     
     private func updateProfileDetails() {
@@ -106,9 +120,9 @@ extension ProfileViewController {
     }
     
     private func createUserAvatarImageView() -> UIImageView {
-        let image = UIImage(resource: .avatarExample)
-        let imageView = UIImageView(image: image)
+        let imageView = UIImageView(image: defaultAvatarImage)
         
+        imageView.tintColor = .ypGray
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
         return imageView
@@ -143,7 +157,6 @@ extension ProfileViewController {
     }
     
     private func setupSubviewsConstraints() {
-        let avatarSize: CGFloat = 70
         let topInset: CGFloat = 32
         let hInset: CGFloat = 24
         let labelSpacing: CGFloat = 8
@@ -159,10 +172,10 @@ extension ProfileViewController {
                 constant: hInset
             ),
             userAvatarImageView.widthAnchor.constraint(
-                equalToConstant: avatarSize
+                equalToConstant: userAvatarSize
             ),
             userAvatarImageView.heightAnchor.constraint(
-                equalToConstant: avatarSize
+                equalToConstant: userAvatarSize
             ),
 
             // logoutButton

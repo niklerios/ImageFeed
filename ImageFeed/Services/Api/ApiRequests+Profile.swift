@@ -6,7 +6,6 @@
 //
 
 extension ApiRequests {
-    
     /// Запрос профиля пользователя
     static func fetchUserRequest(
         byName username: String,

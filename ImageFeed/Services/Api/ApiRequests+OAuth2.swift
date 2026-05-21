@@ -6,7 +6,6 @@
 //
 
 extension ApiRequests {
-    
     /// Запрос на токен авторизации
     ///
     /// - Parameter code: код авторизации ,пришедший от WebView со страницы oauth
