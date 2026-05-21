@@ -9,6 +9,10 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     private let profileService: ProfileService = .shared
+    private let profileImageService: ProfileImageService = .shared
+    private let notificationCenter: NotificationCenter = .default
+    
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     private let baseFontSize: CGFloat = 13
     
@@ -37,7 +41,20 @@ final class ProfileViewController: UIViewController {
         setupUI()
         setupSubviews()
 
+        updateProfileAvatar()
         updateProfileDetails()
+
+        observeProfileImageService()
+    }
+    
+    private func observeProfileImageService() {
+        profileImageServiceObserver = notificationCenter.addObserver(
+            forName: ProfileImageService.didChangeNotification,
+            object: profileImageService,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateProfileAvatar()
+        }
     }
 
     @objc private func didTapLogoutButton(_ sender: UIButton) {
@@ -59,6 +76,17 @@ extension ProfileViewController {
         view.addSubview(logoutButton)
         
         setupSubviewsConstraints()
+    }
+    
+    private func updateProfileAvatar() {
+        guard
+            let avatarURLString = profileImageService.avatarURLString,
+            let avatarURL = URL(string: avatarURLString)
+        else {
+            return
+        }
+        
+        print("UPDATE PROFILE AVATAR", avatarURL)
     }
     
     private func updateProfileDetails() {

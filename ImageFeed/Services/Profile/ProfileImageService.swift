@@ -5,6 +5,8 @@
 //  Created by Alfa on 20.05.2026.
 //
 
+import Foundation
+
 protocol ProfileImageServiceProtocol {
     typealias Completion<T> = ApiRequests.Completion<T>
     
@@ -14,6 +16,8 @@ protocol ProfileImageServiceProtocol {
 
 final class ProfileImageService: ProfileImageServiceProtocol {
     private let networkClient: NetworkClientProtocol
+    
+    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
 
     static let shared = ProfileImageService()
     
@@ -29,6 +33,7 @@ final class ProfileImageService: ProfileImageServiceProtocol {
             
             if case let .success(urlString) = result {
                 self.avatarURLString = urlString
+                self.sendDidChangeNotification(urlString)
             }
             
             if let completion {
@@ -38,4 +43,13 @@ final class ProfileImageService: ProfileImageServiceProtocol {
         
         networkClient.get(with: request)
     }
+    
+    private func sendDidChangeNotification(_ imageURL: String) {
+        NotificationCenter.default.post(
+            name: Self.didChangeNotification,
+            object: self,
+            userInfo: ["URL": imageURL]
+        )
+    }
 }
+
