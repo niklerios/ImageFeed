@@ -17,8 +17,8 @@ final class TabBarController: UITabBarController {
         self.viewControllers = [imagesListViewController, profileViewController]
     }
     
-    private func makeImagesListViewController() -> ImagesListViewController {
-        UIStoryboard.instantiate(ImagesListViewController.self)
+    private func makeImagesListViewController() -> UIViewController {
+        UIStoryboard.abstractViewController(ImagesListViewController.self)
     }
     
     private func makeProfileViewController() -> ProfileViewController {

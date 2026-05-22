@@ -63,13 +63,13 @@ struct NetworkRequest<Response, RequestId: NetworkTaskStorage.RequestId> {
     private mutating func setAuthorization(
         fromStorage storage: NetworkAuthStorageProtocol
     ) {
-        guard
-            let token = storage.authToken,
-            let tokenType = storage.tokenType
-        else {
+        guard let token = storage.authToken else {
             return
         }
         
-        originalRequest.setValue("\(tokenType) \(token)", forHTTPHeaderField: "Authorization")
+        let tokenType = storage.tokenType ?? "Bearer"
+        let header = "Authorization"
+        
+        originalRequest.setValue("\(tokenType) \(token)", forHTTPHeaderField: header)
     }
 }

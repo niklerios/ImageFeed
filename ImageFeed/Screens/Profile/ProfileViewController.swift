@@ -16,7 +16,7 @@ final class ProfileViewController: UIViewController {
     private var profileImageServiceObserver: NSObjectProtocol?
     
     private let baseFontSize: CGFloat = 13
-    private let userAvatarSize: CGFloat = 70
+    private let avatarSize: CGFloat = 70
 
     private lazy var defaultAvatarImage = UIImage(systemName: "person.crop.circle.fill")
     
@@ -90,14 +90,10 @@ extension ProfileViewController {
             return
         }
         
-        let radius = userAvatarSize / 2
-        let processor = RoundCornerImageProcessor(cornerRadius: radius)
-        
         userAvatarImageView.kf.setImage(
             with: avatarURL,
             placeholder: defaultAvatarImage,
             options: [
-                .processor(processor),
                 .transition(.fade(0.3))
             ]
         )
@@ -124,6 +120,8 @@ extension ProfileViewController {
         
         imageView.tintColor = .ypGray
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = avatarSize / 2
+        imageView.clipsToBounds = true
         
         return imageView
     }
@@ -172,10 +170,10 @@ extension ProfileViewController {
                 constant: hInset
             ),
             userAvatarImageView.widthAnchor.constraint(
-                equalToConstant: userAvatarSize
+                equalToConstant: avatarSize
             ),
             userAvatarImageView.heightAnchor.constraint(
-                equalToConstant: userAvatarSize
+                equalToConstant: avatarSize
             ),
 
             // logoutButton

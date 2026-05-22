@@ -56,8 +56,8 @@ extension AuthViewController: WebViewViewControllerDelegate {
     ) {
         let loadingService = self.loadingService
 
-        loadingService.showProgress()
         vc.dismissOrPop()
+        loadingService.showProgress()
 
         oAuth2Service.fetchOAuthToken(with: code) { [weak self] result in
             defer { loadingService.hideProgress() }

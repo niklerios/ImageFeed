@@ -32,6 +32,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             sessionRole: connectingSceneSession.role
         )
 
+        // todo: кажется делегат уже проставляется автоматически исходя из конфига в Info.plist
+        // настройка: Delegate Class Name -> $(PRODUCT_MODULE_NAME).SceneDelegate
         sceneConfiguration.delegateClass = SceneDelegate.self
         return sceneConfiguration
     }
