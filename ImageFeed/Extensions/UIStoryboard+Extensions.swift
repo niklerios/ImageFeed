@@ -18,7 +18,7 @@ extension UIStoryboard {
     ) -> T? {
         let identifier = String(describing: viewController)
 
-        return main.instantiateViewController(withIdentifier: identifier) as? T
+        return storyboard.instantiateViewController(withIdentifier: identifier) as? T
     }
     
     static func abstractViewController(
