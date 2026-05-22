@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftKeychainWrapper
 
 protocol NetworkAuthStorageProtocol: AnyObject {
     var authToken: String? { get set }
@@ -16,15 +17,17 @@ protocol NetworkAuthStorageProtocol: AnyObject {
 final class NetworkAuthStorage: NetworkAuthStorageProtocol {
     private enum Keys: String { case token, tokenType, username }
     private let store: UserDefaults = .standard
+    private let secureStore: KeychainWrapper = .standard
     
     static let shared = NetworkAuthStorage()
     
     var authToken: String? {
         get {
-            store.string(forKey: Keys.token.rawValue)
+            secureStore.string(forKey: Keys.token.rawValue)
         }
         set {
-            store.set(newValue, forKey: Keys.token.rawValue)
+            guard let newValue else { return }
+            secureStore.set(newValue, forKey: Keys.token.rawValue)
         }
     }
     

@@ -63,6 +63,7 @@ final class SplashViewController: UIViewController {
             defer { loadingService.hideProgress() }
 
             guard case let .success(profile) = $0 else {
+                self.showAuthentication()
                 return
             }
             
