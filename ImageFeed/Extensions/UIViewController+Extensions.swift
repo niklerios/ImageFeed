@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import ProgressHUD
 
 extension UIViewController {
     func dismissOrPop(animated: Bool = true) {
