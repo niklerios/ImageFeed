@@ -6,23 +6,33 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
+    private let profileService: ProfileService = .shared
+    private let profileImageService: ProfileImageService = .shared
+    private let notificationCenter: NotificationCenter = .default
+    
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     private let baseFontSize: CGFloat = 13
+    private let avatarSize: CGFloat = 70
+
+    private lazy var defaultAvatarImage = UIImage(appImageName: .profile)
     
     private lazy var userDescriptionLabel = createLabel(
-        withText: "Hello, World!",
+        withText: "Профиль не заполнен",
         font: UIFont.systemFont(ofSize: baseFontSize, weight: .regular)
     )
 
     private lazy var userIdLabel = createLabel(
-        withText: "@ekaterina_nov",
+        withText: "@неизвестный_пользователь",
         font: UIFont.systemFont(ofSize: baseFontSize, weight: .regular),
         color: .ypGray
     )
 
     private lazy var userNameLabel = createLabel(
-        withText: "Екатерина Новикова",
+        withText: "Имя не указано",
         font: UIFont.systemFont(ofSize: 23, weight: .bold)
     )
 
@@ -34,10 +44,24 @@ final class ProfileViewController: UIViewController {
 
         setupUI()
         setupSubviews()
+
+        updateProfileAvatar()
+        updateProfileDetails()
+
+        observeProfileImageService()
+    }
+    
+    private func observeProfileImageService() {
+        profileImageServiceObserver = notificationCenter.addObserver(
+            forName: ProfileImageService.didChangeNotification,
+            object: profileImageService,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateProfileAvatar()
+        }
     }
 
-    @objc
-    private func didTapLogoutButton(_ sender: UIButton) {
+    @objc private func didTapLogoutButton(_ sender: UIButton) {
         print("Exit")
     }
 }
@@ -58,11 +82,46 @@ extension ProfileViewController {
         setupSubviewsConstraints()
     }
     
-    private func createUserAvatarImageView() -> UIImageView {
-        let image = UIImage(resource: .avatarExample)
-        let imageView = UIImageView(image: image)
+    private func updateProfileAvatar() {
+        guard
+            let avatarURLString = profileImageService.avatarURLString,
+            let avatarURL = URL(string: avatarURLString)
+        else {
+            return
+        }
         
+        userAvatarImageView.kf.setImage(
+            with: avatarURL,
+            placeholder: defaultAvatarImage,
+            options: [
+                .transition(.fade(0.3))
+            ]
+        )
+    }
+    
+    private func updateProfileDetails() {
+        guard let profile = profileService.profile else {
+            return
+        }
+        
+        if !profile.name.isEmpty {
+            userNameLabel.text = profile.name
+        }
+        if !profile.username.isEmpty {
+            userIdLabel.text = "@\(profile.username)"
+        }
+        if let bio = profile.bio, !bio.isEmpty {
+            userDescriptionLabel.text = bio
+        }
+    }
+    
+    private func createUserAvatarImageView() -> UIImageView {
+        let imageView = UIImageView(image: defaultAvatarImage)
+        
+        imageView.tintColor = .ypGray
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = avatarSize / 2
+        imageView.clipsToBounds = true
         
         return imageView
     }
@@ -96,7 +155,6 @@ extension ProfileViewController {
     }
     
     private func setupSubviewsConstraints() {
-        let avatarSize: CGFloat = 70
         let topInset: CGFloat = 32
         let hInset: CGFloat = 24
         let labelSpacing: CGFloat = 8

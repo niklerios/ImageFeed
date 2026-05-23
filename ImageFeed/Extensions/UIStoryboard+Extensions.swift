@@ -8,8 +8,25 @@
 import UIKit
 
 extension UIStoryboard {
-    static func instantiate<T: UIViewController>(_ type: T.Type) -> T {
+    static var main: UIStoryboard {
         UIStoryboard(name: "Main", bundle: .main)
-            .instantiateViewController(withIdentifier: String(describing: type)) as! T
+    }
+    
+    static func viewController<T: UIViewController>(
+        _ viewController: T.Type,
+        storyboard: UIStoryboard = .main
+    ) -> T? {
+        let identifier = String(describing: viewController)
+
+        return storyboard.instantiateViewController(withIdentifier: identifier) as? T
+    }
+    
+    static func abstractViewController(
+        _ viewController: UIViewController.Type,
+        storyboard: UIStoryboard = .main
+    ) -> UIViewController {
+        let identifier = String(describing: viewController)
+
+        return storyboard.instantiateViewController(withIdentifier: identifier)
     }
 }

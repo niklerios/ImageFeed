@@ -8,24 +8,54 @@
 import UIKit
 
 final class SplashViewController: UIViewController {
-    private let showAuthViewSegueIdentifier = "ShowAuthView"
+    private let profileService: ProfileService = .shared
+    private let profileImageService: ProfileImageService = .shared
+    private let loadingService: LoadingService = .shared
+    private let networkAuthStorage: NetworkAuthStorage = .shared
     
-    var authToken: String? {
-        OAuth2TokenStorage.shared.token
+    private lazy var logoImageView = createLogoImageView()
+    private var isFirstRendering = true
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setupUI()
+        setupSubviews()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if authToken != nil {
-            switchToTabBarController()
-        } else {
-            showAuthentication()
+        if isFirstRendering {
+            navigateToNextScreen()
+            
+            // viewDidAppear может вызываться много раз; навигируем только при первом рендере
+            isFirstRendering = false
+        }
+    }
+    
+    private func navigateToNextScreen() {
+        guard let _ = networkAuthStorage.authToken else {
+            return showAuthentication()
+        }
+        
+        fetchProfile { [weak self] in
+            self?.switchToTabBarController()
         }
     }
 
     private func showAuthentication() {
-        performSegue(withIdentifier: showAuthViewSegueIdentifier, sender: nil)
+        guard
+            let authViewController = UIStoryboard.viewController(AuthViewController.self)
+        else {
+            assertionFailure("Не удалось создать AuthViewController из сториборда")
+            return
+        }
+        
+        authViewController.delegate = self
+        authViewController.modalPresentationStyle = .fullScreen
+        
+        present(authViewController, animated: true)
     }
     
     private func switchToTabBarController() {
@@ -34,24 +64,42 @@ final class SplashViewController: UIViewController {
             return
         }
         
-        window.rootViewController = UIStoryboard.instantiate(UITabBarController.self)
+        window.rootViewController = UIStoryboard.abstractViewController(TabBarController.self)
     }
-}
+    
+    private func fetchProfile(completion: @escaping () -> ()) {
+        // Удерживаем сильные ссылки на сервисы ,чтоб не зависеть от self в кложурах
+        let loadingService = self.loadingService
+        let profileImageService = self.profileImageService
 
-extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showAuthViewSegueIdentifier {
-            guard
-                let navigationController = segue.destination as? UINavigationController,
-                let viewController = navigationController.viewControllers.first as? AuthViewController
-            else {
-                assertionFailure("Failed to prepare \(showAuthViewSegueIdentifier)")
+        let authUsername = networkAuthStorage.username
+        
+        let fetchProfileImageURL: (String) -> () = { username in
+            // По условию задачи нам не требуется ожидать завершения запроса
+            profileImageService.fetchProfileImageURL(username: username)
+        }
+        
+        // Если удалось забрать username из networkAuthStorage ,то запрашиваем аватар с ним
+        if let authUsername {
+            fetchProfileImageURL(authUsername)
+        }
+        
+        loadingService.showProgress()
+        
+        profileService.fetchProfile {
+            defer { loadingService.hideProgress() }
+
+            guard case let .success(profile) = $0 else {
+                self.showAuthentication()
                 return
             }
             
-            viewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
+            // Если в networkAuthStorage username отсутствует ,то запрашиваем автар отсюда
+            if authUsername == nil {
+                fetchProfileImageURL(profile.username)
+            }
+            
+            completion()
         }
     }
 }
@@ -59,6 +107,33 @@ extension SplashViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismissOrPop()
-        switchToTabBarController()
+        
+        fetchProfile { [weak self] in
+            self?.switchToTabBarController()
+        }
+    }
+}
+
+extension SplashViewController {
+    private func createLogoImageView() -> UIImageView {
+        let image = UIImage(resource: .vector)
+        let imageView = UIImageView(image: image)
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        return imageView
+    }
+    
+    private func setupSubviews() {
+        view.addSubview(logoImageView)
+        
+        NSLayoutConstraint.activate([
+            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+    
+    private func setupUI() {
+        view.backgroundColor = .ypBlack
     }
 }

@@ -7,50 +7,48 @@
 
 import Foundation
 
-struct NetworkRequest<T> {
-    typealias Completion = (Result<T, NetworkError>) -> Void
-    typealias ResponseType = T.Type
+struct NetworkRequest<Response, RequestId: NetworkTaskStorage.RequestId> {
+    typealias Completion = (Result<Response, NetworkError>) -> Void
+    typealias ResponseType = Response.Type
     
-    var urlRequest: URLRequest
+    var originalRequest: URLRequest
+    let requestId: RequestId?
 
     private let responseType: ResponseType
-    private let completion: Completion
+    private let completion: Completion?
     private let completionQueue: DispatchQueue
     
     init(
         url: URL,
+        requestId: RequestId? = nil,
         responseType: ResponseType,
-        completionQueue: DispatchQueue,
-        completion: @escaping Completion
+        authorization: Bool = false,
+        authStorage: NetworkAuthStorageProtocol = NetworkAuthStorage.shared,
+        completionQueue: DispatchQueue = .main,
+        completion: Completion? = nil
     ) {
-        self.urlRequest = URLRequest(url: url)
+        self.originalRequest = URLRequest(url: url)
+        self.requestId = requestId
         self.responseType = responseType
         self.completionQueue = completionQueue
         self.completion = completion
         
+        if (authorization) {
+            setAuthorization(fromStorage: authStorage)
+        }
+        
         setHTTPMethod(.get)
     }
     
-    init(
-        url: URL,
-        responseType: ResponseType,
-        completion: @escaping Completion
-    ) {
-        self.init(
-            url: url,
-            responseType: responseType,
-            completionQueue: .main,
-            completion: completion
-        )
-    }
-    
-    private func executeCompletion(_ result: Result<T, NetworkError>) {
+    private func executeCompletion(_ result: Result<Response, NetworkError>) {
+        guard let completion else { return }
+
         completionQueue.async {
             completion(result)
         }
     }
     
-    func onSuccess(_ result: T) {
+    func onSuccess(_ result: Response) {
         executeCompletion(.success(result))
     }
     
@@ -59,6 +57,19 @@ struct NetworkRequest<T> {
     }
     
     mutating func setHTTPMethod(_ method: NetworkMethod) {
-        urlRequest.httpMethod = method.value
+        originalRequest.httpMethod = method.value
+    }
+    
+    private mutating func setAuthorization(
+        fromStorage storage: NetworkAuthStorageProtocol
+    ) {
+        guard let token = storage.authToken else {
+            return
+        }
+        
+        let tokenType = storage.tokenType ?? "Bearer"
+        let header = "Authorization"
+        
+        originalRequest.setValue("\(tokenType) \(token)", forHTTPHeaderField: header)
     }
 }

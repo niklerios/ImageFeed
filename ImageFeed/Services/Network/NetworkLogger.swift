@@ -11,6 +11,8 @@ struct NetworkLogger {
     static let disabled = Self(isEnabled: false)
     static let enabled = Self(isEnabled: true)
     
+    private let responseMessageLimit = 2000
+    
     private let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier!,
         category: "NetworkClient"
@@ -21,63 +23,46 @@ struct NetworkLogger {
     func success(data: Data, request: URLRequest) {
         guard isEnabled else { return }
         
-        let successPresentation = present(
-            title: "SUCCESS",
-            description: "",
+        let presentation = present(
+            description: "SUCCESS",
             request: request,
             data: data
         )
         
-        logger.info("✅ \(successPresentation)")
+        logger.info("✅ \(presentation)")
     }
     
-    func failure(error: NetworkError, request: URLRequest) {
+    func failure(error: NetworkError, data: Data? = Data(), request: URLRequest) {
         guard isEnabled else { return }
         
-        let logData: (String, String, Data) -> Void = { title, desc, data in
-            let errorPresentation = present(
-                title: "ERROR: \(title)",
-                description: desc,
-                request: request,
-                data: data
-            )
-            
-            logger.error("⚠️ \(errorPresentation)")
-        }
+        let presentation = present(
+            description: error.description,
+            request: request,
+            data: data
+        )
         
-        let log: (String, String) -> Void = {
-            logData($0, $1, Data())
-        }
-        
-        switch error {
-            case let .urlRequestError(error):
-                log("URLRequest", error.localizedDescription)
-            case let .decodingError(error):
-                log("Decoding", error.localizedDescription)
-            case let .statusCodeError(statusCode, data):
-                logData("StatusCode", "\(statusCode)", data)
-            case .urlSessionError:
-                log("URLSession", "")
-            case .invalidResponse:
-                log("InvalidResponse", "")
-        }
+        logger.error("⚠️ \(presentation)")
     }
     
     private func present(
-        title: String,
         description: String,
         request: URLRequest,
-        data: Data
+        data: Data?
     ) -> String {
-        let httpMethod = request.httpMethod ?? "GET"
+        let httpMethod = request.httpMethod?.uppercased() ?? "GET"
         let urlString = request.url?.absoluteString ?? "Unknown URL"
-        let dataString = String(data: data, encoding: .utf8) ?? ""
+        let responseData = data?.utf8String.prefix(responseMessageLimit)
         
         return """
-        NetworkClient [\(title)]: \(description)
+        NetworkClient
 
-        Request: \(httpMethod) \(urlString)
-        Response: \(dataString)
+        URL: \(httpMethod) \(urlString)
+
+        Description:
+        \(description)
+
+        Response:
+        \(responseData ?? "No Data")
         """
     }
 }

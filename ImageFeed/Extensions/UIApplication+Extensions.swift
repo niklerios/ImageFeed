@@ -1,5 +1,5 @@
 //
-//  UIApplication+firstWindow.swift
+//  UIApplication+Extensions.swift
 //  ImageFeed
 //
 //  Created by Alfa on 11.05.2026.

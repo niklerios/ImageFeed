@@ -12,7 +12,8 @@ protocol AuthViewControllerDelegate: AnyObject {
 }
 
 final class AuthViewController: UIViewController {
-    private lazy var oAuth2Service = OAuth2Service.shared
+    private let oAuth2Service: OAuth2Service = .shared
+    private let loadingService: LoadingService = .shared
     
     private lazy var logoImageView = createLogoImageView()
     private lazy var loginButton = createLoginButton()
@@ -53,13 +54,21 @@ extension AuthViewController: WebViewViewControllerDelegate {
         _ vc: WebViewViewController,
         didAutenticateWithCode code: String
     ) {
+        let loadingService = self.loadingService
+
         vc.dismissOrPop()
+        loadingService.showProgress()
 
         oAuth2Service.fetchOAuthToken(with: code) { [weak self] result in
-            guard let self, case .success = result else {
+            defer { loadingService.hideProgress() }
+            
+            guard let self else { return }
+
+            guard case .success = result else {
+                self.showAuthErrorAlert()
                 return
             }
-
+            
             self.delegate?.didAuthenticate(self)
         }
     }
@@ -167,5 +176,18 @@ extension AuthViewController {
                 equalToConstant: 48
             )
         ])
+    }
+    
+    private func showAuthErrorAlert() {
+        let alertController = UIAlertController(
+            title: "Что-то пошло не так",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert
+        )
+        let okAction = UIAlertAction(title: "Ок", style: .default)
+        
+        alertController.addAction(okAction)
+
+        present(alertController, animated: true)
     }
 }
