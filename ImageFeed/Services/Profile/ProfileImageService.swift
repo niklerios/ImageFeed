@@ -17,7 +17,7 @@ protocol ProfileImageServiceProtocol {
 final class ProfileImageService: ProfileImageServiceProtocol {
     private let networkClient: NetworkClientProtocol
     
-    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
+    static let didChangeNotification = Notification.Name(.profileImageDidChange)
 
     static let shared = ProfileImageService()
     

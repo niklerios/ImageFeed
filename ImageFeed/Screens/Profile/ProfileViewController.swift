@@ -18,7 +18,7 @@ final class ProfileViewController: UIViewController {
     private let baseFontSize: CGFloat = 13
     private let avatarSize: CGFloat = 70
 
-    private lazy var defaultAvatarImage = UIImage(systemName: "person.crop.circle.fill")
+    private lazy var defaultAvatarImage = UIImage(appImageName: .profile)
     
     private lazy var userDescriptionLabel = createLabel(
         withText: "Профиль не заполнен",
