@@ -14,6 +14,7 @@ final class SplashViewController: UIViewController {
     private let networkAuthStorage: NetworkAuthStorage = .shared
     
     private lazy var logoImageView = createLogoImageView()
+    private var isFirstRendering = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,10 +26,19 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        if isFirstRendering {
+            navigateToNextScreen()
+            
+            // viewDidAppear может вызываться много раз; навигируем только при первом рендере
+            isFirstRendering = false
+        }
+    }
+    
+    private func navigateToNextScreen() {
         guard let _ = networkAuthStorage.authToken else {
             return showAuthentication()
         }
-
+        
         fetchProfile { [weak self] in
             self?.switchToTabBarController()
         }
