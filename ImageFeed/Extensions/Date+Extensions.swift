@@ -22,3 +22,9 @@ private extension DateFormatter {
         return formatter
     }()
 }
+
+extension Date {
+    static func from(_ string: String) -> Date? {
+        ISO8601DateFormatter().date(from: string)
+    }
+}

@@ -16,8 +16,6 @@ protocol ProfileImageServiceProtocol {
 
 final class ProfileImageService: ProfileImageServiceProtocol {
     private let networkClient: NetworkClientProtocol
-    
-    static let didChangeNotification = Notification.Name(.profileImageDidChange)
 
     static let shared = ProfileImageService()
     
@@ -46,7 +44,7 @@ final class ProfileImageService: ProfileImageServiceProtocol {
     
     private func sendDidChangeNotification(_ imageURL: String) {
         NotificationCenter.default.post(
-            name: Self.didChangeNotification,
+            name: AppNotification.profileImageDidChange.name,
             object: self,
             userInfo: ["URL": imageURL]
         )

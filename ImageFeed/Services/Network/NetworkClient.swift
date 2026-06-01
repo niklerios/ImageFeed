@@ -83,16 +83,14 @@ struct NetworkClient {
             logger.success(data: $1, request: urlRequest)
         }
         
-        if let sameTask = taskStorage.findTask(by: requestId) {
-            let previousTaskUrl = sameTask.originalRequest?.url
-            let currentTaskUrl = urlRequest.url
-            
-            guard previousTaskUrl != currentTaskUrl else {
-                return failure(.requestAlreadyInProgress, nil)
+        if let activeTask = taskStorage.findTask(by: requestId) {
+            do {
+                try resolveDuplication(candidate: request, activeTask: activeTask)
+            } catch let error as NetworkError {
+                return failure(error, nil)
+            } catch {
+                return failure(.unknownError(error), nil)
             }
-            
-            taskStorage.delete(by: requestId)
-            sameTask.cancel()
         }
                 
         let task = urlSession.dataTask(with: urlRequest) { data, response, error in
@@ -131,6 +129,41 @@ struct NetworkClient {
         
         taskStorage.store(task, for: requestId)
         task.resume()
+    }
+    
+    private func resolveDuplication<Response: Decodable, RequestId>(
+        candidate: Request<Response, RequestId>,
+        activeTask: URLSessionTask
+    ) throws {
+        let activeTaskUrl = activeTask.originalRequest?.url
+        let candidateUrl = candidate.originalRequest.url
+        let requestId = candidate.requestId
+        let isDifferentData = activeTaskUrl != candidateUrl
+        
+        let cancelActive = {
+            taskStorage.delete(by: requestId)
+            activeTask.cancel()
+        }
+        
+        let skipDuplicate: () throws -> () = {
+            throw NetworkError.requestAlreadyInProgress
+        }
+        
+        switch candidate.duplicationResolvingStrategy {
+        case .cancelActiveAlways:
+            cancelActive()
+        case .skipDuplicateAlways:
+            try skipDuplicate()
+        case .cancelActiveIfDifferentData where isDifferentData:
+            cancelActive()
+        case .cancelActiveIfDifferentData where !isDifferentData:
+            try skipDuplicate()
+        case .skipDuplicateIfDifferentData where isDifferentData:
+            try skipDuplicate()
+        case .skipDuplicateIfDifferentData where !isDifferentData:
+            cancelActive()
+        default: break
+        }
     }
     
     private func decode<T: Decodable>(_ data: Data) throws -> T {

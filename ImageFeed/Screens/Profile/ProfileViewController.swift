@@ -53,7 +53,7 @@ final class ProfileViewController: UIViewController {
     
     private func observeProfileImageService() {
         profileImageServiceObserver = notificationCenter.addObserver(
-            forName: ProfileImageService.didChangeNotification,
+            forName: AppNotification.profileImageDidChange.name,
             object: profileImageService,
             queue: .main
         ) { [weak self] _ in
