@@ -74,41 +74,11 @@ final class ImagesListViewController: UIViewController {
         let settings = ImagesListCellSettings(
             imageURL: photoURL,
             isLiked: photo.isLiked,
-            date: photo.createdAt ?? Date(),
-            onLike: { [weak self] in
-                self?.changeLike(photoId: photo.id, isLiked: !photo.isLiked)
-            }
+            date: photo.createdAt ?? Date()
         )
         
         cell.configure(with: settings)
-    }
-    
-    private func changeLike(photoId: String, isLiked: Bool) {
-        loadingService.showProgress()
-
-        imagesListService.changeLike(
-            photoId: photoId,
-            isLike: isLiked
-        ) { [weak self, loadingService] result in
-            defer {
-                loadingService.hideProgress()
-            }
-
-            guard let self, case .success = result else {
-                return
-            }
-            
-            self.handleChangeLike(photoId: photoId, isLiked: isLiked)
-        }
-    }
-    
-    private func handleChangeLike(photoId: String, isLiked: Bool) {
-        guard let photoIndex = (photos.firstIndex { $0.id == photoId }) else {
-            return
-        }
-        
-        photos[photoIndex].isLiked = isLiked
-        tableView.reloadRows(at: [IndexPath(row: photoIndex, section: 0)], with: .none)
+        cell.delegate = self
     }
     
     private func getPhoto(by index: Int) -> Photo? {
@@ -117,6 +87,10 @@ final class ImagesListViewController: UIViewController {
 
     private func configureTableView() {
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+    }
+    
+    private func syncPhotos() {
+        photos = imagesListService.photos
     }
 }
 
@@ -194,6 +168,34 @@ extension ImagesListViewController {
             viewController.image = UIImage()
         } else {
             super.prepare(for: segue, sender: sender)
+        }
+    }
+}
+
+// MARK: - ImagesListCellDelegate
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imagesListCellDidTapLike(_ cell: ImagesListCell) {
+        guard
+            let indexPath = tableView.indexPath(for: cell),
+            let photo = getPhoto(by: indexPath.row)
+        else {
+            return
+        }
+        
+        let isLiked = !photo.isLiked
+        
+        loadingService.showProgress()
+        
+        imagesListService.changeLike(
+            photoId: photo.id,
+            isLike: isLiked
+        ) { [weak self, loadingService] result in
+            loadingService.hideProgress()
+
+            if case .success = result {
+                self?.syncPhotos()
+                cell.setIsLiked(isLiked)
+            }
         }
     }
 }

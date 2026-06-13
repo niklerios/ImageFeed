@@ -45,12 +45,26 @@ final class ImagesListService: ImagesImageListServiceProtocol {
         isLike: Bool,
         completion: @escaping Completion<EmptyResponse>
     ) {
-        let request = ApiRequests.likePhoto(by: photoId, completion: completion)
+        let request = ApiRequests.likePhoto(by: photoId) { [weak self] result in
+            if case .success = result {
+                self?.updatePhotoLike(photoId: photoId, isLiked: isLike)
+            }
+            
+            completion(result)
+        }
         
         if isLike {
             networkClient.post(with: request)
         } else {
             networkClient.delete(with: request)
         }
+    }
+    
+    private func updatePhotoLike(photoId: String, isLiked: Bool) {
+        guard let photoIndex = (photos.firstIndex { $0.id == photoId }) else {
+            return
+        }
+        
+        photos[photoIndex].isLiked = isLiked
     }
 }

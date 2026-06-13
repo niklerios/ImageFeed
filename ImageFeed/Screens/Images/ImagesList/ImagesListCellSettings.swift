@@ -11,7 +11,6 @@ struct ImagesListCellSettings {
     let imageURL: URL
     let isLiked: Bool
     let date: Date
-    let onLike: () -> Void
     
     var dateString: String {
         date.dateTimeString

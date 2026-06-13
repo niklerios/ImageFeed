@@ -8,6 +8,10 @@
 import UIKit
 import Kingfisher
 
+protocol ImagesListCellDelegate: AnyObject {
+    func imagesListCellDidTapLike(_ cell: ImagesListCell)
+}
+
 final class ImagesListCell: UITableViewCell {
     @IBOutlet private var photoImageView: UIImageView!
     @IBOutlet private var likeButtonView: UIButton!
@@ -15,11 +19,11 @@ final class ImagesListCell: UITableViewCell {
     
     static let reuseIdentifier = "ImagesListCell"
     static let cellMargins: (h: CGFloat, v: CGFloat) = (h: 16, v: 4)
+    
+    weak var delegate: ImagesListCellDelegate?
 
     private let gradientLayer = CAGradientLayer()
     private lazy var placeholder = UIImage(resource: .stub)
-    
-    private var onLike: (() -> Void)? = nil
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -32,19 +36,13 @@ final class ImagesListCell: UITableViewCell {
     }
     
     @IBAction func didTapLikeButton(_ sender: UIButton) {
-        onLike?()
+        delegate?.imagesListCellDidTapLike(self)
     }
 
     func configure(with settings: ImagesListCellSettings) {
-        let image: UIImage = settings.isLiked
-            ? .likeButtonOn
-            : .likeButtonOff
-
         dateTextView.text = settings.dateString
-        likeButtonView.setImage(image, for: .normal)
 
-        onLike = settings.onLike
-        
+        setIsLiked(settings.isLiked)
         setupViewBeforeImageLoading()
         
         photoImageView.kf.setImage(
@@ -55,6 +53,12 @@ final class ImagesListCell: UITableViewCell {
                 self?.setupViewWhenImageLoaded()
             }
         }
+    }
+    
+    func setIsLiked(_ isLiked: Bool) {
+        let image: UIImage = isLiked ? .likeButtonOn : .likeButtonOff
+        
+        likeButtonView.setImage(image, for: .normal)
     }
     
     private func setupViewBeforeImageLoading() {
