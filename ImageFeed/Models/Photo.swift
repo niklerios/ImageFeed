@@ -13,6 +13,7 @@ struct Photo {
     let createdAt: Date?
     let welcomeDescription: String?
     let thumbImageURL: String
+    let smallImageURL: String
     let largeImageURL: String
     let isLiked: Bool
 }
@@ -25,6 +26,7 @@ extension Photo {
         welcomeDescription = response.description
         thumbImageURL = response.urls.thumb
         largeImageURL = response.urls.regular
+        smallImageURL = response.urls.small
 
         // TODO: -
         isLiked = false

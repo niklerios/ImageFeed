@@ -24,7 +24,7 @@ private extension DateFormatter {
 }
 
 extension Date {
-    static func from(_ string: String) -> Date? {
+    nonisolated static func from(_ string: String) -> Date? {
         ISO8601DateFormatter().date(from: string)
     }
 }

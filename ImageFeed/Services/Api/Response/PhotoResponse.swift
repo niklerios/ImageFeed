@@ -9,6 +9,7 @@ struct PhotoResponse: Decodable {
     struct Urls: Decodable {
         let thumb: String
         let regular: String
+        let small: String
     }
 
     let id: String
