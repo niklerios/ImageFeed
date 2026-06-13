@@ -19,6 +19,8 @@ final class ImagesListCell: UITableViewCell {
     private let gradientLayer = CAGradientLayer()
     private lazy var placeholder = UIImage(resource: .stub)
     
+    private var onLike: (() -> Void)? = nil
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         updateGradientFrame(height: 30)
@@ -29,6 +31,10 @@ final class ImagesListCell: UITableViewCell {
         photoImageView.kf.cancelDownloadTask()
     }
     
+    @IBAction func didTapLikeButton(_ sender: UIButton) {
+        onLike?()
+    }
+
     func configure(with settings: ImagesListCellSettings) {
         let image: UIImage = settings.isLiked
             ? .likeButtonOn
@@ -36,6 +42,8 @@ final class ImagesListCell: UITableViewCell {
 
         dateTextView.text = settings.dateString
         likeButtonView.setImage(image, for: .normal)
+
+        onLike = settings.onLike
         
         setupViewBeforeImageLoading()
         

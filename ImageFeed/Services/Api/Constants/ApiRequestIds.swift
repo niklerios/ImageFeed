@@ -10,4 +10,5 @@ enum ApiRequestIds: String, NetworkTaskStorage.RequestId {
     case fetchUser
     case fetchMe
     case fetchPhotos
+    case like
 }

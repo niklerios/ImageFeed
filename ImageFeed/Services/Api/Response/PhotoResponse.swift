@@ -18,4 +18,5 @@ struct PhotoResponse: Decodable {
     let createdAt: String
     let description: String?
     let urls: Urls
+    let likedByUser: Bool
 }

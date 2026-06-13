@@ -73,11 +73,42 @@ final class ImagesListViewController: UIViewController {
         
         let settings = ImagesListCellSettings(
             imageURL: photoURL,
-            isLiked: false,
-            date: photo.createdAt ?? Date()
+            isLiked: photo.isLiked,
+            date: photo.createdAt ?? Date(),
+            onLike: { [weak self] in
+                self?.changeLike(photoId: photo.id, isLiked: !photo.isLiked)
+            }
         )
         
         cell.configure(with: settings)
+    }
+    
+    private func changeLike(photoId: String, isLiked: Bool) {
+        loadingService.showProgress()
+
+        imagesListService.changeLike(
+            photoId: photoId,
+            isLike: isLiked
+        ) { [weak self, loadingService] result in
+            defer {
+                loadingService.hideProgress()
+            }
+
+            guard let self, case .success = result else {
+                return
+            }
+            
+            self.handleChangeLike(photoId: photoId, isLiked: isLiked)
+        }
+    }
+    
+    private func handleChangeLike(photoId: String, isLiked: Bool) {
+        guard let photoIndex = (photos.firstIndex { $0.id == photoId }) else {
+            return
+        }
+        
+        photos[photoIndex].isLiked = isLiked
+        tableView.reloadRows(at: [IndexPath(row: photoIndex, section: 0)], with: .none)
     }
     
     private func getPhoto(by index: Int) -> Photo? {

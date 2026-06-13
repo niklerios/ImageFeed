@@ -15,7 +15,8 @@ struct Photo {
     let thumbImageURL: String
     let smallImageURL: String
     let largeImageURL: String
-    let isLiked: Bool
+
+    var isLiked: Bool
 }
 
 extension Photo {
@@ -27,8 +28,6 @@ extension Photo {
         thumbImageURL = response.urls.thumb
         largeImageURL = response.urls.regular
         smallImageURL = response.urls.small
-
-        // TODO: -
-        isLiked = false
+        isLiked = response.likedByUser
     }
 }

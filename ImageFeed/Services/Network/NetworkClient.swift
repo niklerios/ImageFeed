@@ -67,11 +67,11 @@ struct NetworkClient {
         method: NetworkMethod
     ) {
         var request = request
+        
+        request.setHTTPMethod(method)
 
         let urlRequest = request.originalRequest
         let requestId = request.requestId
-
-        request.setHTTPMethod(method)
         
         let failure: (NetworkError, Data?) -> Void = {
             request.onFailure($0)

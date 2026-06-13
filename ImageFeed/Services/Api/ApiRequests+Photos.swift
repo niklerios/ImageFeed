@@ -29,4 +29,20 @@ extension ApiRequests {
             completion: completion
         )
     }
+    
+    static func likePhoto(
+        by id: String,
+        completion: @escaping Completion<EmptyResponse>
+    ) -> Request<EmptyResponse> {
+        let networkURL = URLBuilder.baseApi(path: "/photos/\(id)/like")
+        
+        return Request(
+            url: networkURL.url,
+            requestId: .like,
+            duplicationResolvingStrategy: .skipDuplicateAlways,
+            responseType: EmptyResponse.self,
+            authorization: true,
+            completion: completion
+        )
+    }
 }

@@ -8,6 +8,8 @@
 import Foundation
 
 protocol ImagesImageListServiceProtocol: AnyObject {
+    typealias Completion<T> = ApiRequests.Completion<T>
+
     func fetchPhotosNextPage()
 }
 
@@ -36,5 +38,19 @@ final class ImagesListService: ImagesImageListServiceProtocol {
         }
         
         networkClient.get(with: request)
+    }
+    
+    func changeLike(
+        photoId: String,
+        isLike: Bool,
+        completion: @escaping Completion<EmptyResponse>
+    ) {
+        let request = ApiRequests.likePhoto(by: photoId, completion: completion)
+        
+        if isLike {
+            networkClient.post(with: request)
+        } else {
+            networkClient.delete(with: request)
+        }
     }
 }
