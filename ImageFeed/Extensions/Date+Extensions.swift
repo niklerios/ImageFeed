@@ -9,6 +9,10 @@ import Foundation
 
 extension Date {
     var dateTimeString: String { DateFormatter.defaultDateTime.string(from: self) }
+    
+    static func from(_ string: String) -> Date? {
+        DateFormatter.iso8601.date(from: string)
+    }
 }
 
 private extension DateFormatter {
@@ -21,10 +25,6 @@ private extension DateFormatter {
 
         return formatter
     }()
-}
-
-extension Date {
-    nonisolated static func from(_ string: String) -> Date? {
-        ISO8601DateFormatter().date(from: string)
-    }
+    
+    static let iso8601 = ISO8601DateFormatter()
 }

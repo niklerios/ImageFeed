@@ -13,7 +13,7 @@ struct Profile {
 }
 
 extension Profile {
-    nonisolated init(_ response: MeResponse) {
+    init(_ response: MeResponse) {
         username = response.username
         name = "\(response.firstName) \(response.lastName)"
         login = "@\(response.username)"
