@@ -164,8 +164,7 @@ extension ImagesListViewController {
                 return
             }
 
-            // TODO: - передавать актуальную картинку или URL
-            viewController.image = UIImage()
+            viewController.photo = photo
         } else {
             super.prepare(for: segue, sender: sender)
         }

@@ -6,14 +6,16 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class SingleImageViewController: UIViewController {
-    var image: UIImage? {
+    private var image: UIImage?
+    
+    var photo: Photo? {
         didSet {
             guard isViewLoaded else { return }
-            
+    
             configureImageView()
-            rescaleAndCenterImageInScrollView()
         }
     }
     
@@ -21,14 +23,14 @@ final class SingleImageViewController: UIViewController {
     @IBOutlet private var shareButtonView: UIButton!
     @IBOutlet private var imageView: UIImageView!
     
+    private let loadingService: LoadingService = .shared
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         configureScrollView()
         configureImageView()
         configureShareButtonView()
-
-        rescaleAndCenterImageInScrollView()
     }
     
     @IBAction func didTapBackButton(_ sender: UIButton) {
@@ -94,15 +96,54 @@ final class SingleImageViewController: UIViewController {
     }
     
     private func configureImageView() {
-        guard let image else { return }
+        guard
+            let photo,
+            let photoUrl = URL(string: photo.largeImageURL)
+        else {
+            return
+        }
         
-        imageView.image = image
-        imageView.frame.size = image.size
+        loadingService.showProgress()
+        
+        imageView.kf.setImage(with: photoUrl) { [weak self, loadingService] in
+            defer {
+                loadingService.hideProgress()
+            }
+
+            guard let self else {
+                return
+            }
+
+            if case let .success(data) = $0 {
+                self.image = data.image
+                self.rescaleAndCenterImageInScrollView()
+            } else {
+                self.showError()
+            }
+        }
     }
     
     private func configureShareButtonView() {
         shareButtonView.layer.cornerRadius = shareButtonView.bounds.height / 2
         shareButtonView.clipsToBounds = true
+    }
+    
+    private func showError() {
+        let alertController = UIAlertController(
+            title: "Ошибка",
+            message: "Что-то пошло не так. Попробовать ещё раз?",
+            preferredStyle: .alert
+        )
+        
+        let cancelAction = UIAlertAction(title: "Не надо", style: .cancel)
+        let repeatAction = UIAlertAction(title: "Повторить", style: .default) { _ in
+            self.configureImageView()
+        }
+        
+        alertController.addAction(cancelAction)
+        alertController.addAction(repeatAction)
+        
+        present(alertController, animated: true)
     }
 }
 

@@ -48,8 +48,8 @@ final class ImagesListCell: UITableViewCell {
         photoImageView.kf.setImage(
             with: settings.imageURL,
             placeholder: placeholder
-        ) { [weak self] result in
-            if case .success = result {
+        ) { [weak self] in
+            if case .success = $0 {
                 self?.setupViewWhenImageLoaded()
             }
         }
