@@ -12,6 +12,7 @@ protocol ProfileImageServiceProtocol {
     
     var avatarURLString: String? { get }
     func fetchProfileImageURL(username: String, completion: Completion<String>?)
+    func cleanAvatar()
 }
 
 final class ProfileImageService: ProfileImageServiceProtocol {
@@ -31,7 +32,7 @@ final class ProfileImageService: ProfileImageServiceProtocol {
             
             if case let .success(urlString) = result {
                 self.avatarURLString = urlString
-                self.sendDidChangeNotification(urlString)
+                self.sendDidChangeNotification()
             }
             
             if let completion {
@@ -42,11 +43,15 @@ final class ProfileImageService: ProfileImageServiceProtocol {
         networkClient.get(with: request)
     }
     
-    private func sendDidChangeNotification(_ imageURL: String) {
+    func cleanAvatar() {
+        avatarURLString = nil
+        sendDidChangeNotification()
+    }
+    
+    private func sendDidChangeNotification() {
         NotificationCenter.default.post(
             name: AppNotification.profileImageDidChange.name,
-            object: self,
-            userInfo: ["URL": imageURL]
+            object: self
         )
     }
 }

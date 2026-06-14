@@ -54,6 +54,13 @@ final class ImagesListViewController: UIViewController {
         let photosCount = photos.count
         let newPhotos = imagesListService.photos
         
+        guard newPhotos.count > 0 else {
+            photos = newPhotos
+            tableView.reloadData()
+            
+            return
+        }
+        
         let range = (photosCount..<newPhotos.count)
         let rows = range.map { IndexPath(row: $0, section: 0) }
         

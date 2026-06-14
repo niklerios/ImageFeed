@@ -11,6 +11,7 @@ import Kingfisher
 final class ProfileViewController: UIViewController {
     private let profileService: ProfileService = .shared
     private let profileImageService: ProfileImageService = .shared
+    private let profileLogoutService: ProfileLogoutService = .shared
     private let notificationCenter: NotificationCenter = .default
     
     private var profileImageServiceObserver: NSObjectProtocol?
@@ -62,7 +63,14 @@ final class ProfileViewController: UIViewController {
     }
 
     @objc private func didTapLogoutButton(_ sender: UIButton) {
-        print("Exit")
+        profileLogoutService.logout {
+            guard let window = UIApplication.shared.activeKeyWindow else {
+                assertionFailure("Invalid window configuration")
+                return
+            }
+            
+            window.rootViewController = SplashViewController()
+        }
     }
 }
 

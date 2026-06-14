@@ -11,6 +11,7 @@ protocol ImagesImageListServiceProtocol: AnyObject {
     typealias Completion<T> = ApiRequests.Completion<T>
 
     func fetchPhotosNextPage()
+    func cleanPhotos()
 }
 
 final class ImagesListService: ImagesImageListServiceProtocol {
@@ -38,6 +39,14 @@ final class ImagesListService: ImagesImageListServiceProtocol {
         }
         
         networkClient.get(with: request)
+    }
+    
+    func cleanPhotos() {
+        let notificationName = AppNotification.newPhotosDidLoad.name
+
+        photos = []
+        lastLoadedPage = 0
+        notificationCenter.post(name: notificationName, object: self)
     }
     
     func changeLike(

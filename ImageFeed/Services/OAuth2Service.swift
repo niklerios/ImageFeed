@@ -14,6 +14,7 @@ protocol OAuth2ServiceProtocol: AnyObject {
         with code: String,
         completion: @escaping Completion<String>
     )
+    func cleanToken()
 }
 
 final class OAuth2Service: OAuth2ServiceProtocol {
@@ -42,5 +43,9 @@ final class OAuth2Service: OAuth2ServiceProtocol {
         }
         
         networkClient.post(with: request)
+    }
+    
+    func cleanToken() {
+        authStorage.clean()
     }
 }
