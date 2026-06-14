@@ -7,14 +7,14 @@
 
 import Foundation
 
-protocol ImagesImageListServiceProtocol: AnyObject {
+protocol ImagesListServiceProtocol: AnyObject {
     typealias Completion<T> = ApiRequests.Completion<T>
 
     func fetchPhotosNextPage()
     func cleanPhotos()
 }
 
-final class ImagesListService: ImagesImageListServiceProtocol {
+final class ImagesListService: ImagesListServiceProtocol {
     static let shared = ImagesListService()
     
     private let networkClient: NetworkClientProtocol

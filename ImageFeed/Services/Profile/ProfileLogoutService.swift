@@ -17,13 +17,13 @@ final class ProfileLogoutService: ProfileLogoutServiceProtocol {
     
     private let profileService: ProfileServiceProtocol
     private let profileImageService: ProfileImageServiceProtocol
-    private let imagesListService: ImagesImageListServiceProtocol
+    private let imagesListService: ImagesListServiceProtocol
     private let oAuth2Service: OAuth2ServiceProtocol
     
     private init(
         profileService: ProfileServiceProtocol = ProfileService.shared,
         profileImageService: ProfileImageServiceProtocol = ProfileImageService.shared,
-        imagesListService: ImagesImageListServiceProtocol = ImagesListService.shared,
+        imagesListService: ImagesListServiceProtocol = ImagesListService.shared,
         oAuth2Service: OAuth2ServiceProtocol = OAuth2Service.shared
     ) {
         self.profileService = profileService
