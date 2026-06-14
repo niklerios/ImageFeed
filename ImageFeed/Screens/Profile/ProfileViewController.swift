@@ -61,8 +61,8 @@ final class ProfileViewController: UIViewController {
             self?.updateProfileAvatar()
         }
     }
-
-    @objc private func didTapLogoutButton(_ sender: UIButton) {
+    
+    private func logout() {
         profileLogoutService.logout {
             guard let window = UIApplication.shared.activeKeyWindow else {
                 assertionFailure("Invalid window configuration")
@@ -71,6 +71,24 @@ final class ProfileViewController: UIViewController {
             
             window.rootViewController = SplashViewController()
         }
+    }
+
+    @objc private func didTapLogoutButton(_ sender: UIButton) {
+        let alertController = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены что хотите выйти?",
+            preferredStyle: .alert
+        )
+        
+        let okAction = UIAlertAction(title: "Да", style: .default) { _ in
+            self.logout()
+        }
+        let cancelAction = UIAlertAction(title: "Нет", style: .default)
+        
+        alertController.addAction(okAction)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true)
     }
 }
 
