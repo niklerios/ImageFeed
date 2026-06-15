@@ -10,11 +10,13 @@ import ProgressHUD
 
 protocol LoadingServiceProtocol: AnyObject {
     func showProgress()
-    func hideProgress()
+    func hideProgress(force: Bool?)
 }
 
 final class LoadingService: LoadingServiceProtocol {
     static let shared = LoadingService()
+    
+    private var activeCount = 0
     
     private init() {
         // В либе ProgressHUD баг скалирования (скейл x1.4 и обратный x1/1.4 применяются к исходному фрейму)
@@ -26,13 +28,16 @@ final class LoadingService: LoadingServiceProtocol {
     }
     
     func showProgress() {
-        // Альтернатива - дизейблить window ,но мне показалось логичнее использовать вшитый механизм в либу
-        // UIApplication.shared.keyWindow?.isUserInteractionEnabled = false
+        activeCount += 1
         ProgressHUD.animate(interaction: false)
     }
     
-    func hideProgress() {
-        // UIApplication.shared.keyWindow?.isUserInteractionEnabled = true
-        ProgressHUD.dismiss()
+    func hideProgress(force: Bool? = false) {
+        activeCount -= 1
+        
+        if activeCount <= 0 || force == true {
+            ProgressHUD.dismiss()
+            activeCount = 0
+        }
     }
 }

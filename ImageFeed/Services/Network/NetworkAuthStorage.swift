@@ -12,6 +12,8 @@ protocol NetworkAuthStorageProtocol: AnyObject {
     var authToken: String? { get set }
     var tokenType: String? { get set }
     var username: String? { get set }
+    
+    func clean()
 }
 
 final class NetworkAuthStorage: NetworkAuthStorageProtocol {
@@ -50,4 +52,12 @@ final class NetworkAuthStorage: NetworkAuthStorageProtocol {
     }
     
     private init() {}
+    
+    func clean() {
+        secureStore.removeAllKeys()
+        
+        store.dictionaryRepresentation().keys.forEach {
+            store.removeObject(forKey: $0)
+        }
+    }
 }

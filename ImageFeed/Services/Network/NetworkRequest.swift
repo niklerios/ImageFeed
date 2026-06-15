@@ -18,9 +18,12 @@ struct NetworkRequest<Response, RequestId: NetworkTaskStorage.RequestId> {
     private let completion: Completion?
     private let completionQueue: DispatchQueue
     
+    let duplicationResolvingStrategy: NetworkDuplicationResolvingStrategy
+    
     init(
         url: URL,
         requestId: RequestId? = nil,
+        duplicationResolvingStrategy: NetworkDuplicationResolvingStrategy = .cancelActiveIfDifferentData,
         responseType: ResponseType,
         authorization: Bool = false,
         authStorage: NetworkAuthStorageProtocol = NetworkAuthStorage.shared,
@@ -29,6 +32,7 @@ struct NetworkRequest<Response, RequestId: NetworkTaskStorage.RequestId> {
     ) {
         self.originalRequest = URLRequest(url: url)
         self.requestId = requestId
+        self.duplicationResolvingStrategy = duplicationResolvingStrategy
         self.responseType = responseType
         self.completionQueue = completionQueue
         self.completion = completion

@@ -9,6 +9,7 @@ protocol ProfileServiceProtocol: AnyObject {
     typealias Completion<T> = ApiRequests.Completion<T>
 
     func fetchProfile(completion: @escaping Completion<Profile>)
+    func cleanProfile()
 }
 
 final class ProfileService: ProfileServiceProtocol {
@@ -20,6 +21,10 @@ final class ProfileService: ProfileServiceProtocol {
     
     private init(networkClient: NetworkClientProtocol = NetworkClient.shared) {
         self.networkClient = networkClient
+    }
+    
+    func cleanProfile() {
+        profile = nil
     }
 
     func fetchProfile(completion: @escaping Completion<Profile>) {

@@ -11,6 +11,7 @@ import Kingfisher
 final class ProfileViewController: UIViewController {
     private let profileService: ProfileService = .shared
     private let profileImageService: ProfileImageService = .shared
+    private let profileLogoutService: ProfileLogoutService = .shared
     private let notificationCenter: NotificationCenter = .default
     
     private var profileImageServiceObserver: NSObjectProtocol?
@@ -53,16 +54,41 @@ final class ProfileViewController: UIViewController {
     
     private func observeProfileImageService() {
         profileImageServiceObserver = notificationCenter.addObserver(
-            forName: ProfileImageService.didChangeNotification,
+            forName: AppNotification.profileImageDidChange.name,
             object: profileImageService,
             queue: .main
         ) { [weak self] _ in
             self?.updateProfileAvatar()
         }
     }
+    
+    private func logout() {
+        profileLogoutService.logout {
+            guard let window = UIApplication.shared.activeKeyWindow else {
+                assertionFailure("Invalid window configuration")
+                return
+            }
+            
+            window.rootViewController = SplashViewController()
+        }
+    }
 
     @objc private func didTapLogoutButton(_ sender: UIButton) {
-        print("Exit")
+        let alertController = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены что хотите выйти?",
+            preferredStyle: .alert
+        )
+        
+        let okAction = UIAlertAction(title: "Да", style: .default) { _ in
+            self.logout()
+        }
+        let cancelAction = UIAlertAction(title: "Нет", style: .default)
+        
+        alertController.addAction(okAction)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true)
     }
 }
 

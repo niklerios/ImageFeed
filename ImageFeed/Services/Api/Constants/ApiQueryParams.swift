@@ -13,4 +13,6 @@ enum ApiQueryParams: String {
     case code
     case response_type
     case scope
+    case page
+    case per_page
 }
