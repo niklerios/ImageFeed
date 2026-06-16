@@ -41,7 +41,7 @@ final class AuthViewController: UIViewController {
                 return
             }
             
-            let webViewPresenter = WebViewPresenter()
+            let webViewPresenter = WebViewPresenter(authHelper: AuthHelper())
             
             webViewViewController.presenter = webViewPresenter
             webViewPresenter.view = webViewViewController

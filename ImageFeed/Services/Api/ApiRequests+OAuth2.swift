@@ -31,13 +31,13 @@ extension ApiRequests {
     }
     
     /// Запрос на отображение страницы oauth
-    static func loadAuthWebPageRequest() -> Request<Void> {
-        let networkURL = URLBuilder.base(path: "/oauth/authorize") { queryParams in
+    static func loadAuthWebPageRequest(with configuration: AuthConfiguration) -> Request<Void> {
+        let networkURL = URLBuilder.base(path: configuration.authPathString) { queryParams in
             queryParams
-                .add(.client_id, Constants.accessKey)
-                .add(.redirect_uri, Constants.redirectURI)
+                .add(.client_id, configuration.accessKey)
+                .add(.redirect_uri, configuration.redirectURI)
                 .add(.response_type, "code")
-                .add(.scope, Constants.accessScope)
+                .add(.scope, configuration.accessScope)
         }
         
         return Request(
