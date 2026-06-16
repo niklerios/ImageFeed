@@ -1,0 +1,40 @@
+{
+  "configurations" : [
+    {
+      "id" : "2EE045AA-4011-4D62-ABDC-0EB94B51DAB4",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "environmentVariableEntries" : [
+      {
+        "key" : "ACCESS_KEY",
+        "value" : "_gCXQNZHKgHxhPK3ybCgfkjmSBE7efPIXrHf5jaTlTM"
+      },
+      {
+        "key" : "SECRET_KEY",
+        "value" : "jTFfwHJ6PtCxrn0xhvArUemv9YqXVOeutK-qeoajrpU"
+      }
+    ],
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:ImageFeed.xcodeproj",
+      "identifier" : "751E94422F75D2AB00FC3B0B",
+      "name" : "ImageFeed"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:ImageFeed.xcodeproj",
+        "identifier" : "C39764762FE13950007B1820",
+        "name" : "ImageFeedTests"
+      }
+    }
+  ],
+  "version" : 1
+}

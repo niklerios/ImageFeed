@@ -180,7 +180,7 @@
         <!--Web View-->
         <scene sceneID="diQ-4W-4pX">
             <objects>
-                <viewController modalPresentationStyle="fullScreen" id="yo2-MR-cKS" userLabel="Web View" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="WebViewViewController" modalPresentationStyle="fullScreen" id="yo2-MR-cKS" userLabel="Web View" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="7JP-Wy-c5X">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
