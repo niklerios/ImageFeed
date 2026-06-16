@@ -34,8 +34,9 @@ final class ImagesListService: ImagesListServiceProtocol {
             if case let .success(photos) = $0 {
                 self.photos.append(contentsOf: photos.map(Photo.init))
                 self.lastLoadedPage = nextPage
-                self.notificationCenter.post(name: notificationName, object: self)
             }
+            
+            self.notificationCenter.post(name: notificationName, object: self)
         }
         
         networkClient.get(with: request)

@@ -16,11 +16,21 @@ protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
-final class WebViewViewController: UIViewController {
+protocol WebViewViewControllerProtocol: AnyObject {
+    var presenter: WebViewPresenterProtocol? { get set }
+    
+    func loadAuthView(request: URLRequest)
+    func setProgressValue(_ newValue: Float)
+    func setProgressHidden(_ isHidden: Bool)
+}
+
+final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
     private lazy var webView = createWebView()
     private lazy var progressView = createProgressView()
     
     private var estimatedProgressObservation: NSKeyValueObservation?
+    
+    var presenter: WebViewPresenterProtocol?
     
     weak var delegate: WebViewViewControllerDelegate?
     
@@ -31,7 +41,7 @@ final class WebViewViewController: UIViewController {
         setupUISubviews()
 
         observeEstimatedProgressChanges()
-        loadAuthView()
+        presenter?.viewDidLoad()
     }
 
     private func observeEstimatedProgressChanges() {
@@ -39,19 +49,23 @@ final class WebViewViewController: UIViewController {
             \.estimatedProgress,
              options: []
         ) { [weak self] _, _ in
-            self?.updateProgress()
+            guard let self, let presenter = self.presenter else { return }
+            let progressValue = self.webView.estimatedProgress
+
+            presenter.didUpdateProgressValue(progressValue)
         }
     }
     
-    private func updateProgress() {
-        progressView.progress = Float(webView.estimatedProgress)
-        progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
+    func setProgressValue(_ newValue: Float) {
+        progressView.progress = newValue
     }
     
-    private func loadAuthView() {
-        let request = ApiRequests.loadAuthWebPageRequest()
-        
-        webView.load(request.originalRequest)
+    func setProgressHidden(_ isHidden: Bool) {
+        progressView.isHidden = isHidden
+    }
+    
+    func loadAuthView(request: URLRequest) {
+        webView.load(request)
     }
 }
 
@@ -71,17 +85,11 @@ extension WebViewViewController: WKNavigationDelegate {
     }
     
     private func code(from navigationAction: WKNavigationAction) -> String? {
-        if
-            let url = navigationAction.request.url,
-            let urlComponents = URLComponents(string: url.absoluteString),
-            urlComponents.path == "/oauth/authorize/native",
-            let items = urlComponents.queryItems,
-            let codeItem = items.first(where: { $0.name == "code" })
-        {
-            return codeItem.value
-        } else {
-            return nil
+        if let url = navigationAction.request.url {
+            return presenter?.code(from: url)
         }
+        
+        return nil
     }
 }
 
