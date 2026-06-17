@@ -137,6 +137,8 @@ extension AuthViewController {
         button.layer.cornerRadius = 16
         button.clipsToBounds = true
         
+        button.accessibilityIdentifier = AccessibilityIdentifier.loginButton
+        
         button.addTarget(
             self,
             action: #selector(Self.didTapLoginButton),

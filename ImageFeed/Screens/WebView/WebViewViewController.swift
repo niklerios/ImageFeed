@@ -113,6 +113,8 @@ extension WebViewViewController {
         webView.backgroundColor = .ypWhite
         webView.navigationDelegate = self
         
+        webView.accessibilityIdentifier = AccessibilityIdentifier.webView
+        
         return webView
     }
     
