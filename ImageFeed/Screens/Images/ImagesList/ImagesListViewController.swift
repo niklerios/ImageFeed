@@ -12,7 +12,6 @@ final class ImagesListViewController: UIViewController {
     
     private let imagesListService: ImagesListService = .shared
     private let notificationCenter: NotificationCenter = .default
-    private let loadingService: LoadingService = .shared
     
     private var newPhotosDidLoadObserver: NSObjectProtocol?
     
@@ -39,15 +38,13 @@ final class ImagesListViewController: UIViewController {
             forName: AppNotification.newPhotosDidLoad.name,
             object: imagesListService,
             queue: .main
-        ) { [weak self, loadingService] _ in
-            loadingService.hideProgress()
+        ) { [weak self] _ in
             self?.updateTableViewWithNewPhotos()
         }
     }
     
     private func loadNewPhotos() {
-        loadingService.showProgress()
-        imagesListService.fetchPhotosNextPage()
+        imagesListService.fetchPhotosNextPage(showLoading: true)
     }
     
     private func updateTableViewWithNewPhotos() {
@@ -128,6 +125,10 @@ extension ImagesListViewController: UITableViewDataSource {
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath
     ) {
+        print(
+                "willDisplay row=\(indexPath.row), " +
+                "photos=\(photos.count)"
+            )
         if indexPath.row == photos.count - 1 {
             loadNewPhotos()
         }
@@ -190,14 +191,10 @@ extension ImagesListViewController: ImagesListCellDelegate {
         
         let isLiked = !photo.isLiked
         
-        loadingService.showProgress()
-        
         imagesListService.changeLike(
             photoId: photo.id,
             isLike: isLiked
-        ) { [weak self, loadingService] result in
-            loadingService.hideProgress()
-
+        ) { [weak self] result in
             if case .success = result {
                 self?.syncPhotos()
                 cell.setIsLiked(isLiked)

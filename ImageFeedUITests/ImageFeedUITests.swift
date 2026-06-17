@@ -36,19 +36,24 @@ final class TestHelper {
 }
 
 final class ImageFeedUITests: XCTestCase {
-    private let app = XCUIApplication()
     private let env = ProcessInfo.processInfo.environment
 
-    private lazy var helper = TestHelper(app: app)
+    private var app: XCUIApplication!
+    private var helper: TestHelper!
     
     private var email: String! { env["EMAIL"] }
     private var password: String! { env["PASSWORD"] }
 
     override func setUpWithError() throws {
+        try super.setUpWithError()
+
         continueAfterFailure = false
         
-        app.launchEnvironment["ACCESS_KEY"] = env["ACCESS_KEY"]
-        app.launchEnvironment["SECRET_KEY"] = env["SECRET_KEY"]
+        app = XCUIApplication()
+        helper = TestHelper(app: app)
+        
+        app.launchEnvironment["ACCESS_KEY"] = "_gCXQNZHKgHxhPK3ybCgfkjmSBE7efPIXrHf5jaTlTM"
+        app.launchEnvironment["SECRET_KEY"] = "jTFfwHJ6PtCxrn0xhvArUemv9YqXVOeutK-qeoajrpU"
         
         guard let _ = email, let _ = password else {
             XCTFail("Не заполнены переменные окружения EMAIL и PASSWORD!")
@@ -57,6 +62,13 @@ final class ImageFeedUITests: XCTestCase {
 
         app.launch()
     }
+    
+    override func tearDownWithError() throws {
+            try super.tearDownWithError()
+            
+            app.terminate()
+            app = nil
+        }
 
     func testAuth() throws {
         app.buttons["Authenticate"].tap()
@@ -94,7 +106,11 @@ final class ImageFeedUITests: XCTestCase {
         let likeButtonBeforeTap = helper.findButton(from: firstCell, withId: "LikeButton")
         let isLikedBeforeTap = helper.isLiked(likeButtonBeforeTap)
         
+        sleep(2)
+        
         likeButtonBeforeTap.tap()
+        
+        sleep(2)
         
         let likeButtonAfterTap = helper.findButton(from: firstCell, withId: "LikeButton")
         let isLikedAfterTap = helper.isLiked(likeButtonAfterTap)

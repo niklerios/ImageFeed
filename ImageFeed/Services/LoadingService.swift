@@ -18,6 +18,8 @@ final class LoadingService: LoadingServiceProtocol {
     
     private var activeCount = 0
     
+    var isLoading: Bool { activeCount > 0 }
+    
     private init() {
         // В либе ProgressHUD баг скалирования (скейл x1.4 и обратный x1/1.4 применяются к исходному фрейму)
         // из-за чего получаем некорректные размеры
