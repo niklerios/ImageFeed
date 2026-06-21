@@ -10,7 +10,7 @@ import XCTest
 
 @MainActor
 final class ProfileTests: XCTestCase {
-    let helper = TestHelper()
+    let helper = ProfileTestHelper()
 
     func testViewControllerCallsRefreshProfile() {
         let viewController = ProfileViewController()

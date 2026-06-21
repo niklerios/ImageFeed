@@ -77,8 +77,8 @@ extension ImagesListPresenter: ImagesListPresenterProtocol {
     var photosCount: Int { photos.count }
     
     func viewDidLoad() {
-        loadNewPhotos()
         observeNewPhotosDidLoad()
+        loadNewPhotos()
     }
     
     func loadNewPhotos() {

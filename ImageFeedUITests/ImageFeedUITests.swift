@@ -11,6 +11,8 @@ final class ImageFeedUITests: XCTestCase {
     private var app: XCUIApplication!
     private var helper: TestHelper!
     private var envs: EnvHelper!
+    
+    private let defaultTimeout: Double = 5
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -44,18 +46,18 @@ final class ImageFeedUITests: XCTestCase {
         
         let webView = app.webViews[Ids.webView]
         
-        XCTAssertTrue(webView.waitForExistence(timeout: 5))
+        XCTAssertTrue(webView.waitForExistence(timeout: defaultTimeout))
         
         let loginTextField = webView.descendants(matching: .textField).element
         
-        XCTAssertTrue(loginTextField.waitForExistence(timeout: 5))
+        XCTAssertTrue(loginTextField.waitForExistence(timeout: defaultTimeout))
         
         loginTextField.tap()
         loginTextField.typeText(envs[name: .email])
         
         let passwordTextField = webView.descendants(matching: .secureTextField).element
         
-        XCTAssertTrue(passwordTextField.waitForExistence(timeout: 5))
+        XCTAssertTrue(passwordTextField.waitForExistence(timeout: defaultTimeout))
 
         passwordTextField.tap()
         passwordTextField.typeText(envs[name: .password])
@@ -89,7 +91,7 @@ final class ImageFeedUITests: XCTestCase {
         
         let image = app.scrollViews.images.element(boundBy: 0)
         
-        XCTAssertTrue(image.waitForExistence(timeout: 5))
+        XCTAssertTrue(image.waitForExistence(timeout: defaultTimeout))
         
         image.pinch(withScale: 3, velocity: 1)
         image.pinch(withScale: 0.5, velocity: -1)
@@ -106,17 +108,17 @@ final class ImageFeedUITests: XCTestCase {
         
         let logoutButton = helper.findButton(of: app, withId: Ids.logoutButton)
         
-        XCTAssertTrue(app.staticTexts[envs[name: .username]].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts[envs[name: .userId]].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts[envs[name: .username]].waitForExistence(timeout: defaultTimeout))
+        XCTAssertTrue(app.staticTexts[envs[name: .userId]].waitForExistence(timeout: defaultTimeout))
         
         logoutButton.tap()
         
         let alert = app.alerts[Ids.logoutAlert]
         
-        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        XCTAssertTrue(alert.waitForExistence(timeout: defaultTimeout))
         
         alert.scrollViews.otherElements.buttons[Ids.logoutAlertYes].tap()
         
-        XCTAssertTrue(app.buttons[Ids.authButton].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons[Ids.authButton].waitForExistence(timeout: defaultTimeout))
     }
 }
