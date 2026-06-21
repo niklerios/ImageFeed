@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "F3CD186F-A5F0-42F0-ABBE-4E8C8D613BC1",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:ImageFeed.xcodeproj",
+        "identifier" : "C35A7A922FE1A24B0093418E",
+        "name" : "ImageFeedUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

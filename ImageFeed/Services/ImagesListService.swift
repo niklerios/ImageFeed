@@ -9,9 +9,18 @@ import Foundation
 
 protocol ImagesListServiceProtocol: AnyObject {
     typealias Completion<T> = ApiRequests.Completion<T>
+    
+    var photos: [Photo] { get }
 
-    func fetchPhotosNextPage()
+    func fetchPhotosNextPage(showLoading: Bool)
     func cleanPhotos()
+    
+    func changeLike(
+        photoId: String,
+        isLike: Bool,
+        showLoading: Bool,
+        completion: @escaping Completion<EmptyResponse>
+    )
 }
 
 final class ImagesListService: ImagesListServiceProtocol {
@@ -19,15 +28,17 @@ final class ImagesListService: ImagesListServiceProtocol {
     
     private let networkClient: NetworkClientProtocol
     private let notificationCenter: NotificationCenter = .default
+    private let loadingService: LoadingService = .shared
     
     private(set) var photos = [Photo]()
+
     private var lastLoadedPage: Int = 0
     
     private init(networkClient: NetworkClientProtocol = NetworkClient.shared) {
         self.networkClient = networkClient
     }
     
-    func fetchPhotosNextPage() {
+    func fetchPhotosNextPage(showLoading: Bool = true) {
         let notificationName = AppNotification.newPhotosDidLoad.name
         let nextPage = lastLoadedPage + 1
         let request = ApiRequests.fetchPhotos(page: nextPage, perPage: 10) {
@@ -36,9 +47,17 @@ final class ImagesListService: ImagesListServiceProtocol {
                 self.lastLoadedPage = nextPage
                 self.notificationCenter.post(name: notificationName, object: self)
             }
+            
+            if (showLoading) {
+                self.loadingService.hideProgress()
+            }
         }
         
         networkClient.get(with: request)
+        
+        if (showLoading) {
+            loadingService.showProgress()
+        }
     }
     
     func cleanPhotos() {
@@ -52,11 +71,16 @@ final class ImagesListService: ImagesListServiceProtocol {
     func changeLike(
         photoId: String,
         isLike: Bool,
+        showLoading: Bool = true,
         completion: @escaping Completion<EmptyResponse>
     ) {
         let request = ApiRequests.likePhoto(by: photoId) { [weak self] result in
             if case .success = result {
                 self?.updatePhotoLike(photoId: photoId, isLiked: isLike)
+            }
+            
+            if (showLoading) {
+                self?.loadingService.hideProgress()
             }
             
             completion(result)
@@ -66,6 +90,10 @@ final class ImagesListService: ImagesListServiceProtocol {
             networkClient.post(with: request)
         } else {
             networkClient.delete(with: request)
+        }
+        
+        if (showLoading) {
+            loadingService.showProgress()
         }
     }
     

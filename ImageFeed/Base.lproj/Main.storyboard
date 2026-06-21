@@ -46,6 +46,7 @@
                                                 </label>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="chT-2v-L9F" userLabel="Like Button">
                                                     <rect key="frame" x="260" y="4" width="44" height="44"/>
+                                                    <accessibility key="accessibilityConfiguration" identifier="LikeButton"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="44" id="Ubu-aY-PLp"/>
                                                         <constraint firstAttribute="width" constant="44" id="h2Y-n7-LiM"/>
@@ -128,6 +129,7 @@
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WEa-TA-r3y" userLabel="Back Button">
                                 <rect key="frame" x="8" y="8" width="48" height="48"/>
+                                <accessibility key="accessibilityConfiguration" identifier="BackButton"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="48" id="VQ6-dp-rcH"/>
                                     <constraint firstAttribute="width" secondItem="WEa-TA-r3y" secondAttribute="height" multiplier="1:1" id="cP3-Hv-hpD"/>
@@ -180,7 +182,7 @@
         <!--Web View-->
         <scene sceneID="diQ-4W-4pX">
             <objects>
-                <viewController modalPresentationStyle="fullScreen" id="yo2-MR-cKS" userLabel="Web View" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="WebViewViewController" modalPresentationStyle="fullScreen" id="yo2-MR-cKS" userLabel="Web View" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="7JP-Wy-c5X">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

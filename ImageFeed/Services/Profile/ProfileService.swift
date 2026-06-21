@@ -7,6 +7,8 @@
 
 protocol ProfileServiceProtocol: AnyObject {
     typealias Completion<T> = ApiRequests.Completion<T>
+    
+    var profile: Profile? { get }
 
     func fetchProfile(completion: @escaping Completion<Profile>)
     func cleanProfile()

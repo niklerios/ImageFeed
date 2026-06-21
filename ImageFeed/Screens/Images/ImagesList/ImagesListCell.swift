@@ -55,10 +55,11 @@ final class ImagesListCell: UITableViewCell {
         }
     }
     
-    func setIsLiked(_ isLiked: Bool) {
+    private func setIsLiked(_ isLiked: Bool) {
         let image: UIImage = isLiked ? .likeButtonOn : .likeButtonOff
         
         likeButtonView.setImage(image, for: .normal)
+        likeButtonView.accessibilityValue = isLiked ? "liked" : "notLiked"
     }
     
     private func setupViewBeforeImageLoading() {
