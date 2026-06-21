@@ -160,6 +160,7 @@ extension ProfileViewController {
         )
         
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.accessibilityIdentifier = AccessibilityIdentifier.logoutButton
         button.tintColor = .ypRed
         
         return button

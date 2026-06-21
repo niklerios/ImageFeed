@@ -7,42 +7,10 @@
 
 import XCTest
 
-final class TestHelper {
-    let app: XCUIApplication
-    
-    init(app: XCUIApplication) {
-        self.app = app
-    }
-    
-    func findCell(index: Int) -> XCUIElement {
-        let cell = app.tables.children(matching: .cell).element(boundBy: index)
-        
-        XCTAssertTrue(cell.waitForExistence(timeout: 5))
-        
-        return cell
-    }
-    
-    func findButton(from element: XCUIElement, withId id: String) -> XCUIElement {
-        let button = element.buttons[id]
-
-        XCTAssertTrue(button.waitForExistence(timeout: 5))
-        
-        return button
-    }
-    
-    func isLiked(_ element: XCUIElement) -> Bool {
-        element.accessibilityValue == "liked"
-    }
-}
-
 final class ImageFeedUITests: XCTestCase {
-    private let env = ProcessInfo.processInfo.environment
-
     private var app: XCUIApplication!
     private var helper: TestHelper!
-    
-    private var email: String! { env["EMAIL"] }
-    private var password: String! { env["PASSWORD"] }
+    private var envs: EnvHelper!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -51,14 +19,15 @@ final class ImageFeedUITests: XCTestCase {
         
         app = XCUIApplication()
         helper = TestHelper(app: app)
+        envs = EnvHelper()
         
-        app.launchEnvironment["ACCESS_KEY"] = "_gCXQNZHKgHxhPK3ybCgfkjmSBE7efPIXrHf5jaTlTM"
-        app.launchEnvironment["SECRET_KEY"] = "jTFfwHJ6PtCxrn0xhvArUemv9YqXVOeutK-qeoajrpU"
-        
-        guard let _ = email, let _ = password else {
-            XCTFail("Не заполнены переменные окружения EMAIL и PASSWORD!")
+        guard envs.isAllEnvsSet else {
+            XCTFail("Проверьте ,заполнены ли следующие переменные окружения: \(envs.allEnvNames)")
             return
         }
+        
+        app.launchEnvironment["ACCESS_KEY"] = envs[name: .accessKey]
+        app.launchEnvironment["SECRET_KEY"] = envs[name: .secretKey]
 
         app.launch()
     }
@@ -71,54 +40,85 @@ final class ImageFeedUITests: XCTestCase {
         }
 
     func testAuth() throws {
-        app.buttons["Authenticate"].tap()
+        app.buttons[Ids.authButton].tap()
         
-        let webView = app.webViews["UnsplashWebView"]
+        let webView = app.webViews[Ids.webView]
         
         XCTAssertTrue(webView.waitForExistence(timeout: 5))
+        
+        webView.swipeUp()
         
         let loginTextField = webView.descendants(matching: .textField).element
         
         XCTAssertTrue(loginTextField.waitForExistence(timeout: 5))
         
         loginTextField.tap()
-        loginTextField.typeText(email)
-        webView.swipeUp()
+        loginTextField.typeText(envs[name: .email])
         
         let passwordTextField = webView.descendants(matching: .secureTextField).element
         
         XCTAssertTrue(passwordTextField.waitForExistence(timeout: 5))
 
         passwordTextField.tap()
-        passwordTextField.typeText(password)
-        webView.swipeUp()
+        passwordTextField.typeText(envs[name: .password])
         
-        let loginButton = helper.findButton(from: webView, withId: "Login")
+        let loginButton = helper.findButton(of: webView, withId: Ids.webViewLogin)
         
         loginButton.tap()
         
-        let _ = helper.findCell(index: 0)
+        helper.testImagesFeedShowed()
     }
     
     func testFeed() throws {
-        let firstCell = helper.findCell(index: 0)
+        let firstCell = helper.findCell()
         
-        let likeButtonBeforeTap = helper.findButton(from: firstCell, withId: "LikeButton")
-        let isLikedBeforeTap = helper.isLiked(likeButtonBeforeTap)
+        let testLike = {
+            let likeButtonBeforeTap = self.helper.findButton(of: firstCell, withId: Ids.likeButton)
+            let isLikedBeforeTap = self.helper.isLiked(likeButtonBeforeTap)
+            
+            likeButtonBeforeTap.tap()
+            
+            let likeButtonAfterTap = self.helper.findButton(of: firstCell, withId: Ids.likeButton)
+            let isLikedAfterTap = self.helper.isLiked(likeButtonAfterTap)
+            
+            XCTAssertNotEqual(isLikedBeforeTap, isLikedAfterTap)
+        }
         
-        sleep(2)
+        testLike() // test like
+        testLike() // test unlike
         
-        likeButtonBeforeTap.tap()
+        firstCell.tap()
         
-        sleep(2)
+        let image = app.scrollViews.images.element(boundBy: 0)
         
-        let likeButtonAfterTap = helper.findButton(from: firstCell, withId: "LikeButton")
-        let isLikedAfterTap = helper.isLiked(likeButtonAfterTap)
+        XCTAssertTrue(image.waitForExistence(timeout: 5))
         
-        XCTAssertNotEqual(isLikedBeforeTap, isLikedAfterTap)
+        image.pinch(withScale: 3, velocity: 1)
+        image.pinch(withScale: 0.5, velocity: -1)
+        
+        app.buttons[Ids.backButton].tap()
+        
+        helper.testImagesFeedShowed()
     }
     
     func testProfile() throws {
+        helper.testImagesFeedShowed()
         
+        app.tabBars.buttons.element(boundBy: 1).tap()
+        
+        let logoutButton = helper.findButton(of: app, withId: Ids.logoutButton)
+        
+        XCTAssertTrue(app.staticTexts[envs[name: .username]].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts[envs[name: .userId]].waitForExistence(timeout: 5))
+        
+        logoutButton.tap()
+        
+        let alert = app.alerts[Ids.logoutAlert]
+        
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        
+        alert.scrollViews.otherElements.buttons[Ids.logoutAlertYes].tap()
+        
+        XCTAssertTrue(app.buttons[Ids.authButton].waitForExistence(timeout: 5))
     }
 }

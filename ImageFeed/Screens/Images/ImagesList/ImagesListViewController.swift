@@ -125,13 +125,19 @@ extension ImagesListViewController: UITableViewDataSource {
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath
     ) {
-        print(
-                "willDisplay row=\(indexPath.row), " +
-                "photos=\(photos.count)"
-            )
-        if indexPath.row == photos.count - 1 {
-            loadNewPhotos()
+        let offsetY = tableView.contentOffset.y
+        let viewHeight = tableView.bounds.height
+        let contentHeight = tableView.contentSize.height
+        let cellHeight = cell.bounds.height
+        
+        guard
+            indexPath.row == photos.count - 1,
+            offsetY + viewHeight + cellHeight >= contentHeight
+        else {
+            return
         }
+
+        loadNewPhotos()
     }
 }
 

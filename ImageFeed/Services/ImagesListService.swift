@@ -23,8 +23,6 @@ final class ImagesListService: ImagesListServiceProtocol {
     
     private(set) var photos = [Photo]()
 
-    private var photosIsLoading = false
-
     private var lastLoadedPage: Int = 0
     
     private init(networkClient: NetworkClientProtocol = NetworkClient.shared) {
@@ -32,9 +30,6 @@ final class ImagesListService: ImagesListServiceProtocol {
     }
     
     func fetchPhotosNextPage(showLoading: Bool = true) {
-        // в UI-тестах уходит в бесконечный цикл опроса ,поэтому нужен гвард тут
-        guard !photosIsLoading else { return }
-        
         let notificationName = AppNotification.newPhotosDidLoad.name
         let nextPage = lastLoadedPage + 1
         let request = ApiRequests.fetchPhotos(page: nextPage, perPage: 10) {
@@ -47,13 +42,9 @@ final class ImagesListService: ImagesListServiceProtocol {
             if (showLoading) {
                 self.loadingService.hideProgress()
             }
-            
-            self.photosIsLoading = false
         }
         
         networkClient.get(with: request)
-        
-        photosIsLoading = true
         
         if (showLoading) {
             loadingService.showProgress()

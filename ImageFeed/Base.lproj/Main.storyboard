@@ -129,6 +129,7 @@
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WEa-TA-r3y" userLabel="Back Button">
                                 <rect key="frame" x="8" y="8" width="48" height="48"/>
+                                <accessibility key="accessibilityConfiguration" identifier="BackButton"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="48" id="VQ6-dp-rcH"/>
                                     <constraint firstAttribute="width" secondItem="WEa-TA-r3y" secondAttribute="height" multiplier="1:1" id="cP3-Hv-hpD"/>
