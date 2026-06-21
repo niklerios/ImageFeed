@@ -46,8 +46,6 @@ final class ImageFeedUITests: XCTestCase {
         
         XCTAssertTrue(webView.waitForExistence(timeout: 5))
         
-        webView.swipeUp()
-        
         let loginTextField = webView.descendants(matching: .textField).element
         
         XCTAssertTrue(loginTextField.waitForExistence(timeout: 5))
