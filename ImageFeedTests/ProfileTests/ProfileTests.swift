@@ -8,20 +8,6 @@
 @testable import ImageFeed
 import XCTest
 
-struct TestHelper {
-    func createPresenterWithServiceStubs(
-        profileLogoutService: ProfileLogoutServiceProtocol = ProfileLogoutServiceStub(),
-        profileService: ProfileServiceProtocol = ProfileServiceStub(),
-        profileImageService: ProfileImageServiceProtocol = ProfileImageServiceStub()
-    ) -> ProfilePresenterProtocol {
-        ProfilePresenter(
-            profileLogoutService: profileLogoutService,
-            profileService: profileService,
-            profileImageService: profileImageService
-        )
-    }
-}
-
 @MainActor
 final class ProfileTests: XCTestCase {
     let helper = TestHelper()
