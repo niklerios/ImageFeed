@@ -10,6 +10,8 @@
 		754490012FBFA61F00B7BAF7 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 754490002FBFA61F00B7BAF7 /* Kingfisher */; };
 		754490042FBFC52400B7BAF7 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 754490032FBFC52400B7BAF7 /* SwiftKeychainWrapper */; };
 		755AF9E42FB9030B0045BB9F /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 755AF9E32FB9030B0045BB9F /* ProgressHUD */; };
+		C3F74E822FE8AC43005D1D5D /* ImageFeedTests.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = C3F74E812FE8AC43005D1D5D /* ImageFeedTests.xctestplan */; };
+		C3F74E842FE8AC66005D1D5D /* ImagesFeedUITests.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = C3F74E832FE8AC66005D1D5D /* ImagesFeedUITests.xctestplan */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,9 +34,9 @@
 /* Begin PBXFileReference section */
 		751E94432F75D2AB00FC3B0B /* ImageFeed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageFeed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C35A7A932FE1A24B0093418E /* ImageFeedUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageFeedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C35A7AA02FE1ADA40093418E /* ImageFeedUITests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ImageFeedUITests.xctestplan; sourceTree = "<group>"; };
 		C39764772FE13950007B1820 /* ImageFeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageFeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C397650B2FE13E5E007B1820 /* ImageFeed.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ImageFeed.xctestplan; sourceTree = "<group>"; };
+		C3F74E812FE8AC43005D1D5D /* ImageFeedTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ImageFeedTests.xctestplan; sourceTree = "<group>"; };
+		C3F74E832FE8AC66005D1D5D /* ImagesFeedUITests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ImagesFeedUITests.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -99,8 +101,8 @@
 		751E943A2F75D2AB00FC3B0B = {
 			isa = PBXGroup;
 			children = (
-				C35A7AA02FE1ADA40093418E /* ImageFeedUITests.xctestplan */,
-				C397650B2FE13E5E007B1820 /* ImageFeed.xctestplan */,
+				C3F74E832FE8AC66005D1D5D /* ImagesFeedUITests.xctestplan */,
+				C3F74E812FE8AC43005D1D5D /* ImageFeedTests.xctestplan */,
 				751E94452F75D2AB00FC3B0B /* ImageFeed */,
 				C39764782FE13950007B1820 /* ImageFeedTests */,
 				C35A7A942FE1A24B0093418E /* ImageFeedUITests */,
@@ -246,6 +248,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3F74E842FE8AC66005D1D5D /* ImagesFeedUITests.xctestplan in Resources */,
+				C3F74E822FE8AC43005D1D5D /* ImageFeedTests.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
