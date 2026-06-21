@@ -8,13 +8,20 @@
 import UIKit
 import Kingfisher
 
+protocol ProfileViewControllerProtocol: AnyObject {
+    var presenter: ProfilePresenterProtocol? { get set }
+
+    func navigateToAuth()
+    func updateProfileAvatar(url avatarURL: URL)
+    func updateProfileDetails(name: String, username: String, bio: String)
+}
+
 final class ProfileViewController: UIViewController {
-    private let profileService: ProfileService = .shared
-    private let profileImageService: ProfileImageService = .shared
-    private let profileLogoutService: ProfileLogoutService = .shared
     private let notificationCenter: NotificationCenter = .default
     
-    private var profileImageServiceObserver: NSObjectProtocol?
+    var presenter: ProfilePresenterProtocol?
+    
+    private var profileImageDidChangeObserver: NSObjectProtocol?
     
     private let baseFontSize: CGFloat = 13
     private let avatarSize: CGFloat = 70
@@ -46,30 +53,18 @@ final class ProfileViewController: UIViewController {
         setupUI()
         setupSubviews()
 
-        updateProfileAvatar()
-        updateProfileDetails()
+        presenter?.refreshProfile()
 
-        observeProfileImageService()
+        observeProfileImageDidChange()
     }
     
-    private func observeProfileImageService() {
-        profileImageServiceObserver = notificationCenter.addObserver(
+    private func observeProfileImageDidChange() {
+        profileImageDidChangeObserver = notificationCenter.addObserver(
             forName: AppNotification.profileImageDidChange.name,
-            object: profileImageService,
+            object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.updateProfileAvatar()
-        }
-    }
-    
-    private func logout() {
-        profileLogoutService.logout {
-            guard let window = UIApplication.shared.activeKeyWindow else {
-                assertionFailure("Invalid window configuration")
-                return
-            }
-            
-            window.rootViewController = SplashViewController()
+            self?.presenter?.refreshProfile()
         }
     }
 
@@ -81,7 +76,7 @@ final class ProfileViewController: UIViewController {
         )
         
         let okAction = UIAlertAction(title: "Да", style: .default) { _ in
-            self.logout()
+            self.presenter?.logout()
         }
         let cancelAction = UIAlertAction(title: "Нет", style: .default)
         
@@ -89,6 +84,39 @@ final class ProfileViewController: UIViewController {
         alertController.addAction(cancelAction)
         
         present(alertController, animated: true)
+    }
+}
+
+extension ProfileViewController: ProfileViewControllerProtocol {
+    func navigateToAuth() {
+        guard let window = UIApplication.shared.activeKeyWindow else {
+            assertionFailure("Invalid window configuration")
+            return
+        }
+        
+        window.rootViewController = SplashViewController()
+    }
+    
+    func updateProfileAvatar(url avatarURL: URL) {
+        userAvatarImageView.kf.setImage(
+            with: avatarURL,
+            placeholder: defaultAvatarImage,
+            options: [
+                .transition(.fade(0.3))
+            ]
+        )
+    }
+    
+    func updateProfileDetails(name: String, username: String, bio: String) {
+        if !name.isEmpty {
+            userNameLabel.text = name
+        }
+        if !username.isEmpty {
+            userIdLabel.text = username
+        }
+        if !bio.isEmpty {
+            userDescriptionLabel.text = bio
+        }
     }
 }
 
@@ -106,39 +134,6 @@ extension ProfileViewController {
         view.addSubview(logoutButton)
         
         setupSubviewsConstraints()
-    }
-    
-    private func updateProfileAvatar() {
-        guard
-            let avatarURLString = profileImageService.avatarURLString,
-            let avatarURL = URL(string: avatarURLString)
-        else {
-            return
-        }
-        
-        userAvatarImageView.kf.setImage(
-            with: avatarURL,
-            placeholder: defaultAvatarImage,
-            options: [
-                .transition(.fade(0.3))
-            ]
-        )
-    }
-    
-    private func updateProfileDetails() {
-        guard let profile = profileService.profile else {
-            return
-        }
-        
-        if !profile.name.isEmpty {
-            userNameLabel.text = profile.name
-        }
-        if !profile.username.isEmpty {
-            userIdLabel.text = "@\(profile.username)"
-        }
-        if let bio = profile.bio, !bio.isEmpty {
-            userDescriptionLabel.text = bio
-        }
     }
     
     private func createUserAvatarImageView() -> UIImageView {
