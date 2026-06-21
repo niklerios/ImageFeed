@@ -9,9 +9,18 @@ import Foundation
 
 protocol ImagesListServiceProtocol: AnyObject {
     typealias Completion<T> = ApiRequests.Completion<T>
+    
+    var photos: [Photo] { get }
 
     func fetchPhotosNextPage(showLoading: Bool)
     func cleanPhotos()
+    
+    func changeLike(
+        photoId: String,
+        isLike: Bool,
+        showLoading: Bool,
+        completion: @escaping Completion<EmptyResponse>
+    )
 }
 
 final class ImagesListService: ImagesListServiceProtocol {

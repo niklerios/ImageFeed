@@ -58,6 +58,12 @@ final class ProfileViewController: UIViewController {
         observeProfileImageDidChange()
     }
     
+    deinit {
+        if let profileImageDidChangeObserver {
+            notificationCenter.removeObserver(profileImageDidChangeObserver)
+        }
+    }
+    
     private func observeProfileImageDidChange() {
         profileImageDidChangeObserver = notificationCenter.addObserver(
             forName: AppNotification.profileImageDidChange.name,
